@@ -133,8 +133,8 @@ namespace GameOfLife::Game {
         }
 
         if (livingCells.size() > multiThreadedThreshold) {
-            multiThreadedStep(wrap);
-            return;
+            // multiThreadedStep(wrap);
+            // return;
         }
 
         const std::pair<int, int> directions[] = {
