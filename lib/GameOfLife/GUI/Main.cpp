@@ -72,6 +72,14 @@ namespace GameOfLife::GUI {
                 window.draw(rectangle);
             }
 
+            // Draw a border
+            sf::RectangleShape border(sf::Vector2f(grid.getCols() * cellSize, grid.getRows() * cellSize));
+            border.setPosition(offsetX, offsetY);
+            border.setFillColor(sf::Color::Transparent);
+            border.setOutlineThickness(1);
+            border.setOutlineColor(sf::Color::White);
+            window.draw(border);
+
             window.display();
 
             // Sleep
