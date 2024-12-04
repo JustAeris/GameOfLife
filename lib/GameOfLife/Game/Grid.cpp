@@ -33,6 +33,7 @@ namespace GameOfLife::Game {
     Grid::Grid(const std::vector<std::vector<BaseCell> > &cells, int rows, int cols, int maxRows, int maxCols, bool isDynamic) :
     rows(rows), cols(cols), maxRows(maxRows), maxCols(maxCols), isDynamic(isDynamic) {
         // Initialize the cells
+        this->cells.resize(rows, std::vector<bool>(cols));
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 this->cells[i][j] = cells[i][j].isAlive();
