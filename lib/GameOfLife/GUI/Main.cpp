@@ -1,35 +1,35 @@
 #include "Main.h"
 
-#include "SFML/Graphics/Color.hpp"
-#include "SFML/Graphics/RenderWindow.hpp"
-#include "SFML/Window/Event.hpp"
-#include "SFML/Window/VideoMode.hpp"
+#include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
+#include <SFML/System.hpp>
 
 
 namespace GameOfLife::GUI {
+    /**
+     * Start the GUI loop
+     *
+     * @param argc Arguments count
+     * @param argv Arguments
+     */
     void Main::start(int argc, char *argv[]) {
-        // create the window
-        sf::RenderWindow window(sf::VideoMode(800, 600), "My window");
+        // Get the screen resolution
+        sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
 
-        // run the program as long as the window is open
-        while (window.isOpen())
-        {
-            // check all the window's events that were triggered since the last iteration of the loop
+        // Create the window
+        sf::RenderWindow window(sf::VideoMode(desktop.width * 0.9, desktop.height * 0.8), "Game Of Life", sf::Style::Close);
+
+        while (window.isOpen()) {
             sf::Event event{};
             while (window.pollEvent(event))
             {
-                // "close requested" event: we close the window
                 if (event.type == sf::Event::Closed)
                     window.close();
+
             }
 
-            // clear the window with black color
             window.clear(sf::Color::Black);
 
-            // draw everything here...
-            // window.draw(...);
-
-            // end the current frame
             window.display();
         }
     }
