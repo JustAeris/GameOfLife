@@ -56,6 +56,11 @@ namespace GameOfLife::Game {
         [[nodiscard]] std::vector<std::vector<BaseCell>> getCells() const;
         [[nodiscard]] std::vector<std::vector<bool>> toBooleanGrid() const;
 
+        [[nodiscard]] int getRows() const { return rows; }
+        [[nodiscard]] int getCols() const { return cols; }
+
+        [[nodiscard]] int getMaxRows() const { return maxRows; }
+        [[nodiscard]] int getMaxCols() const { return maxCols; }
     };
 
 }
