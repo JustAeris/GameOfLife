@@ -33,6 +33,8 @@ namespace GameOfLife::Game {
         Grid(int rows, int cols, int maxRows = DEFAULT_MAX_ROWS, int maxCols = DEFAULT_MAX_COLS, bool isDynamic = true);
         Grid(const std::vector<std::vector<bool>> &cells, int rows, int cols, int maxRows = DEFAULT_MAX_ROWS,
             int maxCols = DEFAULT_MAX_COLS, bool isDynamic = true);
+        Grid(const std::vector<std::vector<BaseCell>> &cells, int rows, int cols, int maxRows = DEFAULT_MAX_ROWS,
+            int maxCols = DEFAULT_MAX_COLS, bool isDynamic = true);
         ~Grid() = default;
 
         void setAlive(int row, int col, bool alive);

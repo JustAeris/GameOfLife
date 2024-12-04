@@ -30,6 +30,28 @@ namespace GameOfLife::Game {
         }
     }
 
+    Grid::Grid(const std::vector<std::vector<BaseCell> > &cells, int rows, int cols, int maxRows, int maxCols, bool isDynamic) :
+    rows(rows), cols(cols), maxRows(maxRows), maxCols(maxCols), isDynamic(isDynamic) {
+        // Initialize the cells
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                this->cells[i][j] = cells[i][j].isAlive();
+            }
+        }
+        next = this->cells;
+
+        isMultiThreaded = false;
+
+        // Initialize living cells
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                if (this->cells[i][j])
+                    livingCells.insert(std::make_pair(i, j));
+            }
+        }
+    }
+
+
     void Grid::setAlive(int row, int col, bool alive) {
         cells[row][col] = alive;
         if (alive)
