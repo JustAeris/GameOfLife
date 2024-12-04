@@ -48,7 +48,7 @@ namespace GameOfLife::Game {
         void clear();
 
         void move(int fromRow, int fromCol, int numRows, int numCols, int toRow, int toCol);
-        void resize(int addRows, int addCols);
+        void resize(int addNorth, int addEast, int addSouth, int addWest);
 
         void print() const;
         void print(int fromRow, int fromCol, int toRow, int toCol) const;

@@ -108,17 +108,19 @@ namespace GameOfLife::Game {
         // Check if the grid should be resized
         if (isDynamic && !wrap) {
             // Check if a living cell is on the edge
-            bool onEdge = false;
+            bool onEdgeNorth = false, onEdgeEast = false, onEdgeSouth = false, onEdgeWest = false;
             for (auto &cell : livingCells) {
-                if (cell.first == 0 || cell.first == rows - 1 || cell.second == 0 || cell.second == cols - 1) {
-                    onEdge = true;
-                    break;
+                if (cell.first == 0) {
+                    onEdgeNorth = true;
+                } else if (cell.first == rows - 1) {
+                    onEdgeSouth = true;
+                } else if (cell.second == 0) {
+                    onEdgeWest = true;
+                } else if (cell.second == cols - 1) {
+                    onEdgeEast = true;
                 }
             }
-            // Add 10% to the size (rounded up) if a living cell is on the edge
-            if (onEdge) {
-                resize(rows / 10 + 1, cols / 10 + 1);
-            }
+            resize(onEdgeNorth ? 1 : 0, onEdgeEast ? 1 : 0, onEdgeSouth ? 1 : 0, onEdgeWest ? 1 : 0);
         }
 
         if (livingCells.size() > multiThreadedThreshold) {
@@ -314,23 +316,52 @@ namespace GameOfLife::Game {
 
 
 
-    void Grid::resize(int addRows, int addCols) {
-        // Calculate new dimensions
-        const int newRows = rows + addRows * 2;
-        const int newCols = cols + addCols * 2;
-
-        // Resize the cells
-        cells.resize(newRows, std::vector<bool>(newCols));
-        // Resize each row
-        for (int i = 0; i < rows; ++i) {
-            cells[i].resize(newCols);
+    void Grid::resize(int addNorth, int addEast, int addSouth, int addWest) {
+        // Argument check
+        if (addNorth < 0 || addEast < 0 || addSouth < 0 || addWest < 0) {
+            throw std::invalid_argument("The number of rows and columns to add must be positive.");
         }
 
-        move(0, 0, rows, cols, addRows, addCols);
+        // Check against the maximum size
+        if (rows + addNorth + addSouth > maxRows || cols + addEast + addWest > maxCols) {
+            return;
+        }
 
-        // Update the dimensions
-        rows = newRows;
-        cols = newCols;
+        if (addEast > 0) {
+            for (int i = 0; i < rows; ++i) {
+                cells[i].resize(cols + addEast);
+            }
+            cols += addEast;
+        }
+        if (addSouth > 0) {
+            cells.resize(rows + addSouth, std::vector<bool>(cols));
+            rows += addSouth;
+        }
+
+        if (addNorth > 0) {
+            // Insert new rows at the top
+            cells.insert(cells.begin(), addNorth, std::vector<bool>(cols));
+            rows += addNorth;
+        }
+
+        if (addWest > 0) {
+            // Insert new columns at the left
+            for (int i = 0; i < rows; ++i) {
+                cells[i].insert(cells[i].begin(), addWest, false);
+            }
+            cols += addWest;
+        }
+
+        // Update the living cells set
+        std::unordered_set<std::pair<int, int>, HashFunction> newLivingCells;
+        for (const auto &cell : livingCells) {
+            int newRow = cell.first + addNorth;
+            int newCol = cell.second + addWest;
+            if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols) {
+                newLivingCells.insert({newRow, newCol});
+            }
+        }
+        livingCells = newLivingCells;
 
         // Resize the next generation
         next = cells;
