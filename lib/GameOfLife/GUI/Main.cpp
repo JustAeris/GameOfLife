@@ -55,6 +55,7 @@ namespace GameOfLife::GUI {
 
             // Calculate the cell size based on the window size and grid dimensions
             int cellSize = std::min(window.getSize().x / grid.getCols(), window.getSize().y / grid.getRows());
+            cellSize = std::max(cellSize, 1);
             // Calculate the offset to center the grid
             float offsetX = (window.getSize().x - (grid.getCols() * cellSize)) / 2.0f;
             float offsetY = (window.getSize().y - (grid.getRows() * cellSize)) / 2.0f;
