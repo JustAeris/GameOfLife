@@ -1,6 +1,7 @@
 #include "Main.h"
 #include "CLI/Main.h"
 
+#include <iostream>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/System.hpp>
@@ -58,16 +59,17 @@ namespace GameOfLife::GUI {
             float offsetX = (window.getSize().x - (grid.getCols() * cellSize)) / 2.0f;
             float offsetY = (window.getSize().y - (grid.getRows() * cellSize)) / 2.0f;
 
-            auto baseCells = grid.toBooleanGrid();
+            // Get the cells that changed state
+            auto changedCells = grid.getChangedCells();
 
-            // Draw the cells
-            for (int i = 0; i < grid.getRows(); i++) {
-                for (int j = 0; j < grid.getCols(); j++) {
-                    sf::RectangleShape rectangle(sf::Vector2f(cellSize, cellSize));
-                    rectangle.setPosition(j * cellSize + offsetX, i * cellSize + offsetY);
-                    rectangle.setFillColor(baseCells[i][j] ? sf::Color::White : sf::Color::Black);
-                    window.draw(rectangle);
-                }
+            // Redraw only the cells that changed state
+            for (const auto &cell : changedCells) {
+                int i = cell.first;
+                int j = cell.second;
+                sf::RectangleShape rectangle(sf::Vector2f(cellSize, cellSize));
+                rectangle.setPosition(j * cellSize + offsetX, i * cellSize + offsetY);
+                rectangle.setFillColor(grid.isAlive(i, j) ? sf::Color::White : sf::Color::Black);
+                window.draw(rectangle);
             }
 
             window.display();
