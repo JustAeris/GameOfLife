@@ -28,6 +28,8 @@ namespace GameOfLife::Game {
                     livingCells.insert(std::make_pair(i, j));
             }
         }
+
+        changedCells = livingCells;
     }
 
     Grid::Grid(const std::vector<std::vector<BaseCell> > &cells, int rows, int cols, int maxRows, int maxCols, bool isDynamic) :
@@ -50,6 +52,8 @@ namespace GameOfLife::Game {
                     livingCells.insert(std::make_pair(i, j));
             }
         }
+
+        changedCells = livingCells;
     }
 
 
@@ -64,9 +68,11 @@ namespace GameOfLife::Game {
     void Grid::setAliveNext(int row, int col, bool alive) {
         next[row][col] = alive;
         if (alive)
-            livingCells.insert(std::make_pair(row, col));
+            livingCells.emplace(row, col);
         else
             livingCells.erase(std::make_pair(row, col));
+
+        changedCells.emplace(row, col);
     }
 
 
@@ -105,6 +111,9 @@ namespace GameOfLife::Game {
      * @param wrap If true, the grid will wrap around the edges. This will disable dynamic resizing.
      */
     void Grid::step(bool wrap) {
+        // Clear the changed cells
+        changedCells.clear();
+
         // Check if the grid should be resized
         if (isDynamic && !wrap) {
             // Check if a living cell is on the edge
@@ -189,6 +198,10 @@ namespace GameOfLife::Game {
     void Grid::multiThreadedStep(bool wrap) {
         // Assume that the size check has already been done
 
+        // Clear the changed cells
+        changedCells.clear();
+
+        // Directions to check
         const std::pair<int, int> directions[] = {
             { -1, -1 }, { -1, 0 }, { -1, 1 },
             { 0, -1 }, {0, 0}, { 0, 1 },

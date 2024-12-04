@@ -16,6 +16,7 @@ namespace GameOfLife::Game {
         std::vector<std::vector<bool>> cells;
         std::vector<std::vector<bool>> next;
         std::unordered_set<std::pair<int, int>, HashFunction> livingCells;
+        std::unordered_set<std::pair<int, int>, HashFunction> changedCells;
         int rows;
         int cols;
         int maxRows;
@@ -61,6 +62,9 @@ namespace GameOfLife::Game {
 
         [[nodiscard]] int getMaxRows() const { return maxRows; }
         [[nodiscard]] int getMaxCols() const { return maxCols; }
+
+        [[nodiscard]] std::unordered_set<std::pair<int, int>, HashFunction> getLivingCells() const { return livingCells; }
+        [[nodiscard]] std::unordered_set<std::pair<int, int>, HashFunction> getChangedCells() const { return changedCells; }
     };
 
 }
