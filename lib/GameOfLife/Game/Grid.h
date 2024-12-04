@@ -44,7 +44,7 @@ namespace GameOfLife::Game {
         void toggle(int row, int col);
 
         void step();
-        void step(bool wrap);
+        void step(bool wrap, bool dynamic = true);
         void randomize();
         void clear();
 

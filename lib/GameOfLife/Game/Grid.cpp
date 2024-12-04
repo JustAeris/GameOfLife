@@ -109,13 +109,14 @@ namespace GameOfLife::Game {
      * Steps the grid to the next generation.
      *
      * @param wrap If true, the grid will wrap around the edges. This will disable dynamic resizing.
+     * @param dynamic If true, the grid will resize if a living cell is on the edge (overrides isDynamic property).
      */
-    void Grid::step(bool wrap) {
+    void Grid::step(bool wrap, bool dynamic) {
         // Clear the changed cells
         changedCells.clear();
 
         // Check if the grid should be resized
-        if (isDynamic && !wrap) {
+        if (isDynamic && !wrap && dynamic) {
             // Check if a living cell is on the edge
             bool onEdgeNorth = false, onEdgeEast = false, onEdgeSouth = false, onEdgeWest = false;
             for (auto &cell : livingCells) {
