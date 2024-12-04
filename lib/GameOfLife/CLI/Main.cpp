@@ -9,6 +9,7 @@
 #include "File/Parser.h"
 #include "File/Writer.h"
 #include "Game/ExtendedGrid.h"
+#include "Game/Grid.h"
 
 namespace GameOfLife::CLI {
     /**
@@ -123,7 +124,7 @@ namespace GameOfLife::CLI {
         }
 
         // Create the grid
-        Game::ExtendedGrid grid(cells, rows, cols);
+        Game::Grid grid(cells, rows, cols);
 
         // Create the array for bulk writing
         std::vector<std::vector<std::vector<Game::BaseCell>>> bulk;
