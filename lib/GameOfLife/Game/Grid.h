@@ -50,6 +50,7 @@ namespace GameOfLife::Game {
 
         void move(int fromRow, int fromCol, int numRows, int numCols, int toRow, int toCol);
         void resize(int addNorth, int addEast, int addSouth, int addWest);
+        void insert(const std::vector<std::vector<bool>> &cells, int row, int col, bool hollow = false);
 
         void print() const;
         void print(int fromRow, int fromCol, int toRow, int toCol) const;

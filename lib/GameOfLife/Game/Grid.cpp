@@ -380,6 +380,46 @@ namespace GameOfLife::Game {
         next = cells;
     }
 
+    /**
+     * Inserts a pattern into the grid.
+     *
+     * @param cells The pattern to insert
+     * @param row The row to insert the pattern at
+     * @param col The column to insert the pattern at
+     * @param hollow If true, only the living cells will be inserted
+     */
+    void Grid::insert(const std::vector<std::vector<bool>> &cells, int row, int col, bool hollow) {
+        // Argument check
+        if (row < 0 || row >= rows || col < 0 || col >= cols) {
+            throw std::invalid_argument("The row and column must be within the grid.");
+        }
+
+        // Check against the maximum size
+        if (row + cells.size() > maxRows || col + cells[0].size() > maxCols) {
+            return;
+        }
+
+        // Insert the cells
+        for (int i = 0; i < cells.size(); ++i) {
+            for (int j = 0; j < cells[i].size(); ++j) {
+                if (!hollow || cells[i][j]) {
+                    this->cells[row + i][col + j] = cells[i][j];
+                    changedCells.insert({row + i, col + j});
+                }
+            }
+        }
+
+        // Update the living cells set
+        for (int i = 0; i < cells.size(); ++i) {
+            for (int j = 0; j < cells[i].size(); ++j) {
+                if (cells[i][j]) {
+                    livingCells.insert({row + i, col + j});
+                }
+            }
+        }
+    }
+
+
     void Grid::randomize() {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
