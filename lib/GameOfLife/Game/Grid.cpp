@@ -433,6 +433,7 @@ namespace GameOfLife::Game {
         // Clear the living cells
         for (auto &cell : livingCells) {
             setAlive(cell.first, cell.second, false);
+            changedCells.insert(cell);
         }
         livingCells.clear();
     }
