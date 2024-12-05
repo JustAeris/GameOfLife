@@ -10,10 +10,14 @@ namespace GameOfLife::GUI {
         bool run = true;
         int delay = 100;
         bool showHelp = false;
+        bool verbose = false;
+        bool warp = false;
+        bool dynamic = true;
         CLI::Arguments args;
-        Main() = default;
     public:
-        Main(CLI::Arguments args) : args(std::move(args)) { delay = this->args.getDelay(); }
+        Main() = delete;
+        explicit Main(CLI::Arguments args) : delay(args.getDelay()), verbose(args.isVerbose()), warp(args.doWarp()),
+            dynamic(true), args(std::move(args)) {}
         void start();
         void drawGrid(sf::RenderWindow &window, Game::Grid &grid, bool drawBorder = false);
     };
