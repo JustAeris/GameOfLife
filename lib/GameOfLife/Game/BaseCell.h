@@ -20,7 +20,7 @@ namespace GameOfLife::Game {
         virtual void print() const = 0;
 
         virtual BaseCell& operator=(bool alive) = 0;
-        virtual bool operator==(const BaseCell &cell) const;
+        // virtual bool operator==(const BaseCell &cell) const = 0; For some reason this is not working...
     };
 }
 
