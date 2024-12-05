@@ -15,7 +15,7 @@ namespace GameOfLife::CLI {
     Arguments Arguments::parse(int argc, char *argv[]) {
         // Check for interactive mode
         if (argc == 1 || (argc == 2 && (strcmp(argv[1], "-i") == 0 || strcmp(argv[1], "--interactive") == 0))) {
-            return {"", "", 1000, 100, false, true, true, false, false, '1', '0', ' '};
+            return {"", "", 1000, 100, false, true, true, false, false, false, '1', '0', ' '};
         }
 
         // Check for help
