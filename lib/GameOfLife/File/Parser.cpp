@@ -5,7 +5,6 @@
 #include <stdexcept>
 
 #include "Utils.h"
-#include "Game/Cell.h"
 
 namespace GameOfLife::File {
     /**
@@ -16,13 +15,13 @@ namespace GameOfLife::File {
      * @param cols Number of columns, to be set by the function
      * @return 2D vector of cells
      */
-    std::vector<std::vector<Game::Cell>> Parser::parse(const std::string &filename, int &rows, int &cols) const {
+    std::vector<std::vector<bool>> Parser::parse(const std::string &filename, int &rows, int &cols) {
         if (filename.empty()) {
             throw std::invalid_argument("Filename cannot be empty");
         }
 
-        int fileRows = Utils::getNoOfLines(filename);
-        int fileCols = Utils::getMaxLineLength(filename);
+        const int fileRows = Utils::getNoOfLines(filename);
+        const int fileCols = Utils::getMaxLineLength(filename);
 
         // Open the file
         std::ifstream file(filename);
@@ -31,8 +30,8 @@ namespace GameOfLife::File {
         }
 
         // Read the file line per line
-        std::vector<std::vector<Game::Cell>> cells;
-        cells.resize(fileRows, std::vector<Game::Cell>(fileCols));
+        std::vector<std::vector<bool>> cells;
+        cells.resize(fileRows, std::vector<bool>(fileCols));
 
         std::string line;
         int i = 0;
@@ -75,7 +74,7 @@ namespace GameOfLife::File {
      * @param cols Number of columns, to be set by the function
      * @return 2D vector of cells
      */
-    std::vector<std::vector<Game::Cell> > Parser::parseRLE(const std::string &filename, int& rows, int& cols) {
+    std::vector<std::vector<bool>> Parser::parseRLE(const std::string &filename, int &rows, int &cols) {
         if (filename.empty()) {
             throw std::invalid_argument("Filename cannot be empty");
         }
@@ -102,8 +101,8 @@ namespace GameOfLife::File {
         }
 
         // Read the file line per line
-        std::vector<std::vector<Game::Cell>> cells;
-        cells.resize(rows, std::vector<Game::Cell>(cols));
+        std::vector<std::vector<bool>> cells;
+        cells.resize(rows, std::vector<bool>(cols));
 
         // Parse the RLE pattern
         int row = 0, col = 0;
@@ -140,7 +139,7 @@ namespace GameOfLife::File {
                     col = 0;
                     runLength = 0;
                 } else if (c == '!') {
-                    // End of pattern
+                    // End of the pattern
                     return cells;
                 }
             }

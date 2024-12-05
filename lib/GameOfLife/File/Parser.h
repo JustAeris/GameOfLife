@@ -1,8 +1,10 @@
 #ifndef PARSER_H
 #define PARSER_H
 #include <string>
+#include <utility>
 #include <vector>
 
+#include "BaseParser.h"
 #include "Game/Cell.h"
 #include "FormatConfig.h"
 
@@ -10,21 +12,19 @@ namespace GameOfLife::File {
     /**
      * Parser for reading files
      */
-    class Parser {
+    class Parser final : public BaseParser<std::vector<std::vector<bool>>> {
     private:
         FormatConfig config;
-        Parser() = default;
     public:
-        Parser(char alive, char dead, char delimiter = '\0', char comment = '!') : config(alive, dead, delimiter, comment) {};
-        explicit Parser(const FormatConfig &config) : config(config) {};
+        Parser() = delete;
+        explicit Parser(FormatConfig config) : config(std::move(config)) {};
+        ~Parser() override = default;
 
-        [[nodiscard]] char getDelimiter() const;
-        [[nodiscard]] char getAlive() const;
-        [[nodiscard]] char getDead() const;
+        void setFormatConfig(const FormatConfig &config) { this->config = config; }
 
-        [[nodiscard]] std::vector<std::vector<Game::Cell>> parse(const std::string &filename, int &rows, int &cols) const;
+        [[nodiscard]] std::vector<std::vector<bool>> parse(const std::string &filename, int &rows, int &cols) override;
 
-        static std::vector<std::vector<Game::Cell>> parseRLE(const std::string &filename, int& rows, int& cols);
+        static std::vector<std::vector<bool>> parseRLE(const std::string &filename, int& rows, int& cols);
     };
 
 }
