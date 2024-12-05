@@ -50,6 +50,7 @@ namespace GameOfLife::CLI {
         bool interactive = false;
         bool warp = false;
         bool verbose = false;
+        bool GUI = false;
         char aliveChar = '1';
         char deadChar = '0';
         char separator = ' ';
@@ -102,6 +103,9 @@ namespace GameOfLife::CLI {
             if (arg == "-v" || arg == "--verbose") {
                 verbose = true;
             }
+            if (arg == "-u" || arg == "--user-interface") {
+                GUI = true;
+            }
 
             // Character arguments
             if (arg == "-a" || arg == "--alive-char") {
@@ -138,7 +142,7 @@ namespace GameOfLife::CLI {
 
         // Return the parsed arguments
         return {inputFile, outputFolder, generations, delay, highPerformance, endIfStatic, interactive,
-            warp, verbose, aliveChar, deadChar, separator};
+            warp, verbose, GUI, aliveChar, deadChar, separator};
     }
 
     /**
@@ -158,5 +162,6 @@ namespace GameOfLife::CLI {
         std::cout << "  -d, --dead-char <c>\t\tCharacter to represent dead cells (default: 0, unused if file is .cells or .rle)\n";
         std::cout << "  -e, --separator <c>\t\tCharacter to separate cells (default: space, unused if file is .cells or .rle)\n";
         std::cout << "  -i, --interactive\t\tInteractive mode (overwrites other options)\n";
+        std::cout << "  -u, --user-interface\t\t\tStart the GUI (some options will carry over)\n";
     }
 }

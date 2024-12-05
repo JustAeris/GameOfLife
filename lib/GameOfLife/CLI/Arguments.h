@@ -19,6 +19,7 @@ namespace GameOfLife::CLI {
         bool interactive;
         bool warp;
         bool verbose;
+        bool GUI;
 
         char aliveChar;
         char deadChar;
@@ -30,10 +31,10 @@ namespace GameOfLife::CLI {
 
     public:
         Arguments(std::string  inputFile, std::string  outputFolder, const int generations = 1000, const int delay = 100,
-                const bool highPerformance = false, const bool endIfStatic = true, const bool interactive = false, bool warp = false, bool verbose = false,
+                const bool highPerformance = false, const bool endIfStatic = true, const bool interactive = false, bool warp = false, bool verbose = false, bool GUI = false,
                 const char aliveChar = '1', const char deadChar = '0', const char separator = ' ') :
                 inputFile(std::move(inputFile)), outputFolder(std::move(outputFolder)), generations(generations), delay(delay),
-                highPerformance(highPerformance), endIfStatic(endIfStatic), interactive(interactive), warp(warp), verbose(verbose),
+                highPerformance(highPerformance), endIfStatic(endIfStatic), interactive(interactive), warp(warp), verbose(verbose), GUI(GUI),
                 aliveChar(aliveChar), deadChar(deadChar), separator(separator), valid(true) {}
 
         static Arguments parse(int argc, char *argv[]);
@@ -49,6 +50,7 @@ namespace GameOfLife::CLI {
         [[nodiscard]] bool isInteractive() const { return interactive; }
         [[nodiscard]] bool doWarp() const { return warp; }
         [[nodiscard]] bool isVerbose() const { return verbose; }
+        [[nodiscard]] bool isGUI() const { return GUI; }
 
         [[nodiscard]] char getAliveChar() const { return aliveChar; }
         [[nodiscard]] char getDeadChar() const { return deadChar; }
