@@ -5,13 +5,13 @@ namespace GameOfLife::Game {
     /**
      * Basic cell implementation, it can be derived to add more complex behavior
      */
-    class BaseCell {
+    class Cell {
     private:
         bool alive;
     public:
-        BaseCell();
-        explicit BaseCell(bool alive);
-        virtual ~BaseCell() = default;
+        Cell();
+        explicit Cell(bool alive);
+        virtual ~Cell() = default;
 
         [[nodiscard]] virtual bool isAlive() const;
         void setAlive(bool alive);
@@ -20,8 +20,8 @@ namespace GameOfLife::Game {
         void toggle();
         void print() const;
 
-        BaseCell& operator=(bool alive);
-        bool operator==(const BaseCell &cell) const;
+        Cell& operator=(bool alive);
+        bool operator==(const Cell &cell) const;
     };
 }
 #endif //CELL_H

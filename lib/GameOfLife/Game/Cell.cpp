@@ -1,4 +1,4 @@
-#include "BaseCell.h"
+#include "Cell.h"
 
 #include <iostream>
 
@@ -6,19 +6,19 @@ namespace GameOfLife::Game {
     /**
      * Default constructor
      */
-    BaseCell::BaseCell() : alive(false) {}
+    Cell::Cell() : alive(false) {}
 
     /**
      * Base constructor
      * @param alive Alive
      */
-    BaseCell::BaseCell(const bool alive) : alive(alive) {}
+    Cell::Cell(const bool alive) : alive(alive) {}
 
     /**
      * Check if the cell is alive
      * @return Alive
      */
-    bool BaseCell::isAlive() const {
+    bool Cell::isAlive() const {
         return alive;
     }
 
@@ -26,21 +26,21 @@ namespace GameOfLife::Game {
      * Set cell alive
      * @param alive Alive
      */
-    void BaseCell::setAlive(const bool alive) {
+    void Cell::setAlive(const bool alive) {
         this->alive = alive;
     }
 
     /**
      * Toggle cell
      */
-    void BaseCell::toggle() {
+    void Cell::toggle() {
         alive = !alive;
     }
 
     /**
      * Print the cell
      */
-    void BaseCell::print() const {
+    void Cell::print() const {
         std::cout << (alive ? "X" : ".");
     }
 
@@ -49,7 +49,7 @@ namespace GameOfLife::Game {
      * @param livingNeighbors Living neighbors
      * @return Will be alive
      */
-    bool BaseCell::willBeAlive(const int livingNeighbors) const {
+    bool Cell::willBeAlive(const int livingNeighbors) const {
         if (alive) {
             return livingNeighbors == 2 || livingNeighbors == 3;
         }
@@ -61,7 +61,7 @@ namespace GameOfLife::Game {
      * @param alive Alive
      * @return Cell
      */
-    BaseCell& BaseCell::operator=(bool alive) {
+    Cell& Cell::operator=(bool alive) {
         this->alive = alive;
         return *this;
     }
@@ -71,7 +71,7 @@ namespace GameOfLife::Game {
      * @param cell Cell
      * @return Equal
      */
-    bool BaseCell::operator==(const BaseCell &cell) const {
+    bool Cell::operator==(const Cell &cell) const {
         return this->alive == cell.alive;
     }
 }

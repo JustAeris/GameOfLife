@@ -106,7 +106,7 @@ namespace GameOfLife::CLI {
         // Parse the input file and define the output format
         int rows = 0;
         int cols = 0;
-        std::vector<std::vector<Game::BaseCell>> cells;
+        std::vector<std::vector<Game::Cell>> cells;
         if (args.getInputFile().ends_with(".rle")) {
             cells = File::Parser::parseRLE(args.getInputFile(), rows, cols);
             outputFormat = File::OutputFormat::RLE;
@@ -124,7 +124,7 @@ namespace GameOfLife::CLI {
         Game::Grid grid(cells, rows, cols);
 
         // Create the array for bulk writing
-        std::vector<std::vector<std::vector<Game::BaseCell>>> bulk;
+        std::vector<std::vector<std::vector<Game::Cell>>> bulk;
         bulk.reserve(BULK_SIZE);
 
         // Set decimal precision

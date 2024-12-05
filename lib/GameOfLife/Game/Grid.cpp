@@ -32,7 +32,7 @@ namespace GameOfLife::Game {
         changedCells = livingCells;
     }
 
-    Grid::Grid(const std::vector<std::vector<BaseCell> > &cells, int rows, int cols, int maxRows, int maxCols, bool isDynamic) :
+    Grid::Grid(const std::vector<std::vector<Cell> > &cells, int rows, int cols, int maxRows, int maxCols, bool isDynamic) :
     rows(rows), cols(cols), maxRows(maxRows), maxCols(maxCols), isDynamic(isDynamic) {
         // Initialize the cells
         this->cells.resize(rows, std::vector<bool>(cols));
@@ -438,11 +438,11 @@ namespace GameOfLife::Game {
         livingCells.clear();
     }
 
-    std::vector<std::vector<BaseCell> > Grid::getCells() const {
-        std::vector baseCells(rows, std::vector<BaseCell>(cols));
+    std::vector<std::vector<Cell> > Grid::getCells() const {
+        std::vector baseCells(rows, std::vector<Cell>(cols));
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                baseCells[i][j] = BaseCell(cells[i][j]);
+                baseCells[i][j] = Cell(cells[i][j]);
             }
         }
         return baseCells;

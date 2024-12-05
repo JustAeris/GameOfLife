@@ -3,7 +3,7 @@
 
 #include "Game/BaseGrid.h"
 #include "Game/ExtendedGrid.h"
-#include "Game/BaseCell.h"
+#include "Game/Cell.h"
 #include "Game/HighPerformanceGrid.h"
 
 #include "File/Parser.h"

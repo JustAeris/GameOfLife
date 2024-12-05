@@ -151,7 +151,7 @@ namespace GameOfLife::File {
      * @param outputFolder The folder to write to
      * @param startIndex The index to start from
      */
-    void Writer::writeBulk(const std::vector<std::vector<std::vector<Game::BaseCell>>> &bulk,
+    void Writer::writeBulk(const std::vector<std::vector<std::vector<Game::Cell>>> &bulk,
         const std::string &outputFolder, int startIndex) const {
         // Overload to the static function
         writeBulk(bulk, outputFolder, config, startIndex);
@@ -165,7 +165,7 @@ namespace GameOfLife::File {
      * @param format The format to write in
      * @param startIndex The index to start from
      */
-    void Writer::writeBulk(const std::vector<std::vector<std::vector<Game::BaseCell>>> &bulk,
+    void Writer::writeBulk(const std::vector<std::vector<std::vector<Game::Cell>>> &bulk,
         const std::string &outputFolder, const FormatConfig& format, int startIndex) {
         // Create destination directory
         std::filesystem::path out = Utils::makeAbsolutePath(outputFolder);
@@ -201,7 +201,7 @@ namespace GameOfLife::File {
      * @param format The format to write in
      * @param startIndex The index to start from
      */
-    void Writer::writeBulk(const std::vector<std::vector<std::vector<Game::BaseCell>>> &bulk,
+    void Writer::writeBulk(const std::vector<std::vector<std::vector<Game::Cell>>> &bulk,
         const std::string &outputFolder, const OutputFormat format, int startIndex) {
         switch (format) {
             case OutputFormat::CUSTOM:

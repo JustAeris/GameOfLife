@@ -9,7 +9,7 @@ namespace GameOfLife::Game {
      * @param cols No of columns
      */
     ExtendedGrid::ExtendedGrid(const int rows, const int cols) : rows(rows), cols(cols) {
-        cells.resize(rows, std::vector<BaseCell>(cols));
+        cells.resize(rows, std::vector<Cell>(cols));
         next = cells;
     }
 
@@ -19,7 +19,7 @@ namespace GameOfLife::Game {
      * @param rows No of rows
      * @param cols No of columns
      */
-    ExtendedGrid::ExtendedGrid(const std::vector<std::vector<BaseCell>> &cells, const int rows, const int cols) : rows(rows),
+    ExtendedGrid::ExtendedGrid(const std::vector<std::vector<Cell>> &cells, const int rows, const int cols) : rows(rows),
         cols(cols) {
         this->cells = cells;
         next = cells;
@@ -189,7 +189,7 @@ namespace GameOfLife::Game {
      * @return Cells
      */
     [[nodiscard]]
-    std::vector<std::vector<BaseCell> > ExtendedGrid::getCells() const {
+    std::vector<std::vector<Cell> > ExtendedGrid::getCells() const {
         return cells;
     }
 

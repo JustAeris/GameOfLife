@@ -2,7 +2,7 @@
 #define EXTENDEDGRID_H
 #include <vector>
 
-#include "BaseCell.h"
+#include "Cell.h"
 #include "BaseGrid.h"
 #include "File/FormatConfig.h"
 
@@ -15,12 +15,12 @@ namespace GameOfLife::Game {
     private:
         int rows;
         int cols;
-        std::vector<std::vector<BaseCell>> cells;
-        std::vector<std::vector<BaseCell>> next;
+        std::vector<std::vector<Cell>> cells;
+        std::vector<std::vector<Cell>> next;
         ExtendedGrid() = delete;
     public:
         ExtendedGrid(int rows, int cols);
-        ExtendedGrid(const std::vector<std::vector<BaseCell>> &cells, int rows, int cols);
+        ExtendedGrid(const std::vector<std::vector<Cell>> &cells, int rows, int cols);
 
         void setAlive(int row, int col, bool alive) override;
         [[nodiscard]] bool isAlive(int row, int col) const override;
@@ -37,7 +37,7 @@ namespace GameOfLife::Game {
         void print(File::FormatConfig &format) const;
         void print(File::FormatConfig &format, int fromRow, int fromCol, int toRow, int toCol) const;
 
-        [[nodiscard]] std::vector<std::vector<BaseCell>> getCells() const override;
+        [[nodiscard]] std::vector<std::vector<Cell>> getCells() const override;
         [[nodiscard]] std::vector<std::vector<bool>> toBooleanGrid() const override;
     };
 }

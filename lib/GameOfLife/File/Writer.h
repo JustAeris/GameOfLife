@@ -24,9 +24,9 @@ namespace GameOfLife::File {
         static void writeRLE(const Game::BaseGrid &grid, const std::string &filename);
         static void writeRLE(const std::vector<std::vector<bool>>& matrix, const std::string &filename);
 
-        void writeBulk(const std::vector<std::vector<std::vector<Game::BaseCell>>> &bulk, const std::string &outputFolder, int startIndex = 0) const;
-        static void writeBulk(const std::vector<std::vector<std::vector<Game::BaseCell>>> &bulk, const std::string &outputFolder, const FormatConfig& format, int startIndex = 0);
-        static void writeBulk(const std::vector<std::vector<std::vector<Game::BaseCell>>> &bulk, const std::string &outputFolder, OutputFormat format, int startIndex = 0);
+        void writeBulk(const std::vector<std::vector<std::vector<Game::Cell>>> &bulk, const std::string &outputFolder, int startIndex = 0) const;
+        static void writeBulk(const std::vector<std::vector<std::vector<Game::Cell>>> &bulk, const std::string &outputFolder, const FormatConfig& format, int startIndex = 0);
+        static void writeBulk(const std::vector<std::vector<std::vector<Game::Cell>>> &bulk, const std::string &outputFolder, OutputFormat format, int startIndex = 0);
 
     };
 

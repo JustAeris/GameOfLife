@@ -34,7 +34,7 @@ namespace GameOfLife::Game {
         Grid(int rows, int cols, int maxRows = DEFAULT_MAX_ROWS, int maxCols = DEFAULT_MAX_COLS, bool isDynamic = true);
         Grid(const std::vector<std::vector<bool>> &cells, int rows, int cols, int maxRows = DEFAULT_MAX_ROWS,
             int maxCols = DEFAULT_MAX_COLS, bool isDynamic = true);
-        Grid(const std::vector<std::vector<BaseCell>> &cells, int rows, int cols, int maxRows = DEFAULT_MAX_ROWS,
+        Grid(const std::vector<std::vector<Cell>> &cells, int rows, int cols, int maxRows = DEFAULT_MAX_ROWS,
             int maxCols = DEFAULT_MAX_COLS, bool isDynamic = true);
         ~Grid() = default;
 
@@ -55,7 +55,7 @@ namespace GameOfLife::Game {
         void print() const;
         void print(int fromRow, int fromCol, int toRow, int toCol) const;
 
-        [[nodiscard]] std::vector<std::vector<BaseCell>> getCells() const;
+        [[nodiscard]] std::vector<std::vector<Cell>> getCells() const;
         [[nodiscard]] std::vector<std::vector<bool>> toBooleanGrid() const;
 
         [[nodiscard]] int getRows() const { return rows; }

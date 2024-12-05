@@ -1,6 +1,6 @@
 #ifndef BASEGRID_H
 #define BASEGRID_H
-#include "BaseCell.h"
+#include "Cell.h"
 
 
 namespace GameOfLife::Game {
@@ -25,7 +25,7 @@ namespace GameOfLife::Game {
         virtual void print() const = 0;
         virtual void print(int fromRow, int fromCol, int toRow, int toCol) const = 0;
 
-        [[nodiscard]] virtual std::vector<std::vector<BaseCell>> getCells() const = 0;
+        [[nodiscard]] virtual std::vector<std::vector<Cell>> getCells() const = 0;
         [[nodiscard]] virtual std::vector<std::vector<bool>> toBooleanGrid() const = 0;
     };
 }

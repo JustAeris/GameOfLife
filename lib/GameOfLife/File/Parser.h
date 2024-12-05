@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "Game/BaseCell.h"
+#include "Game/Cell.h"
 #include "FormatConfig.h"
 
 namespace GameOfLife::File {
@@ -22,9 +22,9 @@ namespace GameOfLife::File {
         [[nodiscard]] char getAlive() const;
         [[nodiscard]] char getDead() const;
 
-        [[nodiscard]] std::vector<std::vector<Game::BaseCell>> parse(const std::string &filename, int &rows, int &cols) const;
+        [[nodiscard]] std::vector<std::vector<Game::Cell>> parse(const std::string &filename, int &rows, int &cols) const;
 
-        static std::vector<std::vector<Game::BaseCell>> parseRLE(const std::string &filename, int& rows, int& cols);
+        static std::vector<std::vector<Game::Cell>> parseRLE(const std::string &filename, int& rows, int& cols);
     };
 
 }
