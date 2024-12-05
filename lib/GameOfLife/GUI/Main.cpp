@@ -7,6 +7,7 @@
 #include <SFML/System.hpp>
 
 #include "File/Parser.h"
+#include "File/Utils.h"
 #include "Game/Grid.h"
 
 
@@ -39,24 +40,71 @@ namespace GameOfLife::GUI {
 
         Game::Grid grid(cells, rows, cols, window.getSize().y - 1, window.getSize().x - 1);
 
+        sf::RenderTexture renderTexture;
+        renderTexture.create(window.getSize().x, window.getSize().y);
+
         while (window.isOpen()) {
             sf::Event event{};
             while (window.pollEvent(event)) {
                 if (event.type == sf::Event::Closed)
                     window.close();
+
+                if (event.type == sf::Event::KeyPressed) {
+                    if (event.key.code == sf::Keyboard::Space)
+                        run = !run;
+
+                    if (event.key.code == sf::Keyboard::R)
+                        grid.randomize();
+
+                    if (event.key.code == sf::Keyboard::C)
+                        grid.clear();
+
+                    if (event.key.code == sf::Keyboard::S && !run) {
+                        grid.step();
+                        drawGrid(window, grid);
+                        window.display();
+                    }
+
+                    if (event.key.code == sf::Keyboard::Up)
+                        delay = std::max(delay - 10, 0);
+
+                    if (event.key.code == sf::Keyboard::Down)
+                        delay += 10;
+
+                    if (event.key.code == sf::Keyboard::Escape)
+                        window.close();
+
+                    if (event.key.code == sf::Keyboard::H)
+                        showHelp = !showHelp;
+                }
             }
 
             window.clear(sf::Color::Black);
 
-            // Step the grid
-            grid.step();
+            if (showHelp) {
+                sf::Font font;
+                if (!font.loadFromFile(R"(C:\Users\matth\CLionProjects\GameOfLife-GroupA\cmake-build-debug\Ubuntu-Regular.ttf)")) {
+                    std::cerr << "Error loading font" << std::endl;
+                }
+                sf::Text text;
+                text.setFont(font);
+                text.setString("Space - Start/Stop\nR - Randomize\nC - Clear\nS - Step\nUp/Down - Speed\nEscape - Exit");
+                text.setCharacterSize(24);
+                text.setFillColor(sf::Color::White);
+                text.setPosition(10, 10);
 
-            drawGrid(window, grid);
+                window.draw(text);
+            }
 
-            window.display();
+            if (run) {
+                // Step and draw the grid
+                grid.step();
+                drawGrid(window, grid);
+                window.display();
+            }
 
             // Sleep
-            sf::sleep(sf::milliseconds(100));
+            sleep(sf::milliseconds(delay));
         }
     }
 
