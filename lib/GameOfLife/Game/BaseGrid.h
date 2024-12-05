@@ -1,14 +1,18 @@
 #ifndef BASEGRID_H
 #define BASEGRID_H
 #include <string>
+#include <unordered_set>
+#include <vector>
+
+#include "HashFunction.h"
 #include "File/IWritable.h"
 
 
 namespace GameOfLife::Game {
     /**
-     * Base interface for a grid
+     * Abstract class for a grid
      */
-    template<typename TGrid>
+    template<typename TGrid, typename T>
     class BaseGrid<TGrid> : public File::IWritable {
     public:
         BaseGrid() = default;
@@ -25,6 +29,22 @@ namespace GameOfLife::Game {
 
         virtual void print() const = 0;
         virtual void print(int fromRow, int fromCol, int toRow, int toCol) const = 0;
+
+        virtual void move(std::vector<std::vector<T>> &grid,
+            std::unordered_set<std::pair<int, int>, HashFunction> &livingCells,
+            std::unordered_set<std::pair<int, int>, HashFunction> &changedCells,
+            int fromRow, int fromCol, int numRows, int numCols, int toRow, int toCol);
+
+        virtual void resize(std::vector<std::vector<T>> &grid,
+            std::vector<std::vector<T>> &next,
+            std::unordered_set<std::pair<int, int>, HashFunction> &livingCells,
+            int addNorth, int addEast, int addSouth, int addWest, int rows, int cols, int maxRows, int maxCols);
+
+        void insert(std::vector<std::vector<T>>& grid,
+            std::unordered_set<std::pair<int, int>, HashFunction>& livingCells,
+            std::unordered_set<std::pair<int, int>, HashFunction>& changedCells,
+            const std::vector<std::vector<T>> &cells,
+            int row, int col, int rows, int cols, int maxRows, int maxCols, bool hollow = false);
 
         [[nodiscard]] virtual int getRows() const = 0;
         [[nodiscard]] virtual int getCols() const = 0;
