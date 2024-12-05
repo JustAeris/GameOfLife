@@ -75,6 +75,21 @@ namespace GameOfLife::GUI {
 
                     if (event.key.code == sf::Keyboard::H)
                         showHelp = !showHelp;
+
+                    if (event.key.code == sf::Keyboard::V)
+                        verbose = !verbose;
+
+                    if (event.key.code == sf::Keyboard::W) {
+                        warp = !warp;
+                        if (warp && dynamic)
+                            dynamic = false;
+                    }
+
+                    if (event.key.code == sf::Keyboard::D) {
+                        dynamic = !dynamic;
+                        if (dynamic && warp)
+                            warp = false;
+                    }
                 }
             }
 
