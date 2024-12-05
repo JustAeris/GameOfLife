@@ -21,7 +21,7 @@ namespace GameOfLife::GUI {
             return;
 
         // Initialize the grid
-        File::Parser parser('O', '.', '\0');
+        File::Parser parser(File::FormatConfig('O', '.', '\0'));
         int rows = 0;
         int cols = 0;
         auto cells = parser.parse(args.getInputFile(), rows, cols);
@@ -48,7 +48,7 @@ namespace GameOfLife::GUI {
                         run = !run;
 
                     if (event.key.code == sf::Keyboard::R)
-                        grid.randomize();
+                        grid.randomize(0.2);
 
                     if (event.key.code == sf::Keyboard::C)
                         grid.clear();
