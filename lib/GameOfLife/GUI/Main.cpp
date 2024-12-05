@@ -81,10 +81,6 @@ namespace GameOfLife::GUI {
             window.clear(sf::Color::Black);
 
             if (showHelp) {
-                sf::Font font;
-                if (!font.loadFromFile(R"(C:\Users\matth\CLionProjects\GameOfLife-GroupA\cmake-build-debug\Ubuntu-Regular.ttf)")) {
-                    std::cerr << "Error loading font" << std::endl;
-                }
                 sf::Text text;
                 text.setFont(font);
                 text.setString("Space - Start/Stop\nR - Randomize\nC - Clear\nS - Step\nUp/Down - Speed\nEscape - Exit");
