@@ -265,90 +265,13 @@ namespace GameOfLife::Game {
 
 
     void Grid::move(const int fromRow, const int fromCol, const int numRows, const int numCols, const int toRow, const int toCol) {
-        // Extract the submatrix
-        std::vector submatrix(numRows, std::vector<bool>(numCols));
-        for (int i = 0; i < numRows; ++i) {
-            for (int j = 0; j < numCols; ++j) {
-                submatrix[i][j] = cells[fromRow + i][fromCol + j];
-            }
-        }
-
-        // Clear the original location
-        for (int i = 0; i < numRows; ++i) {
-            for (int j = 0; j < numCols; ++j) {
-                cells[fromRow + i][fromCol + j] = false; // Assuming false is the default value
-            }
-        }
-
-        // Insert the submatrix at the new location
-        for (int i = 0; i < numRows; ++i) {
-            for (int j = 0; j < numCols; ++j) {
-                cells[toRow + i][toCol + j] = submatrix[i][j];
-            }
-        }
-
-        // Update the living cells
-        livingCells.clear();
-        for (int i = 0; i < numRows; ++i) {
-            for (int j = 0; j < numCols; ++j) {
-                if (submatrix[i][j]) {
-                    livingCells.insert(std::make_pair(toRow + i, toCol + j));
-                }
-            }
-        }
+        BaseGrid::move(cells, livingCells, changedCells, fromRow, fromCol, numRows, numCols, toRow, toCol);
     }
 
 
 
     void Grid::resize(const int addNorth, const int addEast, const int addSouth, const int addWest) {
-        // Argument check
-        if (addNorth < 0 || addEast < 0 || addSouth < 0 || addWest < 0) {
-            throw std::invalid_argument("The number of rows and columns to add must be positive.");
-        }
-
-        // Check against the maximum size
-        if (rows + addNorth + addSouth > maxRows || cols + addEast + addWest > maxCols) {
-            return;
-        }
-
-        if (addEast > 0) {
-            for (int i = 0; i < rows; ++i) {
-                cells[i].resize(cols + addEast);
-            }
-            cols += addEast;
-        }
-        if (addSouth > 0) {
-            cells.resize(rows + addSouth, std::vector<bool>(cols));
-            rows += addSouth;
-        }
-
-        if (addNorth > 0) {
-            // Insert new rows at the top
-            cells.insert(cells.begin(), addNorth, std::vector<bool>(cols));
-            rows += addNorth;
-        }
-
-        if (addWest > 0) {
-            // Insert new columns at the left
-            for (int i = 0; i < rows; ++i) {
-                cells[i].insert(cells[i].begin(), addWest, false);
-            }
-            cols += addWest;
-        }
-
-        // Update the living cells set
-        std::unordered_set<std::pair<int, int>, HashFunction> newLivingCells;
-        for (const auto &cell : livingCells) {
-            int newRow = cell.first + addNorth;
-            int newCol = cell.second + addWest;
-            if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols) {
-                newLivingCells.insert({newRow, newCol});
-            }
-        }
-        livingCells = newLivingCells;
-
-        // Resize the next generation
-        next = cells;
+        BaseGrid::resize(cells, next, livingCells, addNorth, addEast, addSouth, addWest, rows, cols, maxRows, maxCols);
     }
 
     /**
@@ -360,34 +283,7 @@ namespace GameOfLife::Game {
      * @param hollow If true, only the living cells will be inserted
      */
     void Grid::insert(const std::vector<std::vector<bool>> &cells, const int row, const int col, const bool hollow) {
-        // Argument check
-        if (row < 0 || row >= rows || col < 0 || col >= cols) {
-            throw std::invalid_argument("The row and column must be within the grid.");
-        }
-
-        // Check against the maximum size
-        if (row + cells.size() > maxRows || col + cells[0].size() > maxCols) {
-            return;
-        }
-
-        // Insert the cells
-        for (int i = 0; i < cells.size(); ++i) {
-            for (int j = 0; j < cells[i].size(); ++j) {
-                if (!hollow || cells[i][j]) {
-                    this->cells[row + i][col + j] = cells[i][j];
-                    changedCells.insert({row + i, col + j});
-                }
-            }
-        }
-
-        // Update the living cells set
-        for (int i = 0; i < cells.size(); ++i) {
-            for (int j = 0; j < cells[i].size(); ++j) {
-                if (cells[i][j]) {
-                    livingCells.insert({row + i, col + j});
-                }
-            }
-        }
+        BaseGrid::insert(this->cells, livingCells, changedCells, cells, row, col, rows, cols, maxRows, maxCols, hollow);
     }
 
 

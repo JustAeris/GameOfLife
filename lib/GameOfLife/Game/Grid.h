@@ -12,7 +12,7 @@
 
 namespace GameOfLife::Game {
 
-    class Grid : public BaseGrid<std::vector<std::vector<bool>>> {
+    class Grid : public BaseGrid<std::vector<std::vector<bool>>, bool> {
     private:
         std::vector<std::vector<bool>> cells;
         std::vector<std::vector<bool>> next;
