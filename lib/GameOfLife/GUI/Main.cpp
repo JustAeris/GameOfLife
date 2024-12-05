@@ -83,7 +83,17 @@ namespace GameOfLife::GUI {
             if (showHelp) {
                 sf::Text text;
                 text.setFont(font);
-                text.setString("Space - Start/Stop\nR - Randomize\nC - Clear\nS - Step\nUp/Down - Speed\nEscape - Exit");
+                auto ss = std::stringstream();
+                ss << "Space - Start/Stop\n"
+                   << "R - Randomize\n"
+                   << "C - Clear\n"
+                   << "S - Step\n"
+                   << "Up/Down - Speed\n"
+                   << "Escape - Exit\n"
+                   << "V - Verbose " << (verbose ? "(On)" : "(Off)")
+                   << "\nW - Wrap " << (warp ? "(On)" : "(Off)")
+                   << "\nD - Dynamic " << (dynamic ? "(On)" : "(Off)");
+                text.setString(ss.str());
                 text.setCharacterSize(24);
                 text.setFillColor(sf::Color::White);
                 text.setPosition(10, 10);
