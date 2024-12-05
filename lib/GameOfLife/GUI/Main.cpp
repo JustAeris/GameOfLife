@@ -42,6 +42,8 @@ namespace GameOfLife::GUI {
             std::cerr << "Error loading font" << std::endl;
         }
 
+        int generation = 0;
+
         while (window.isOpen()) {
             sf::Event event{};
             while (window.pollEvent(event)) {
@@ -121,6 +123,7 @@ namespace GameOfLife::GUI {
                 // Step and draw the grid
                 grid.step(warp, dynamic);
                 auto stepTime = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - now).count();
+                generation++;
                 drawGrid(window, grid);
                 auto drawTime = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - now).count();
 
@@ -134,7 +137,7 @@ namespace GameOfLife::GUI {
                         "\nLiving cells: " + std::to_string(grid.getLivingCells().size()) +
                         "\nDead cells: " + std::to_string(grid.getRows() * grid.getCols() - grid.getLivingCells().size()) +
                         "\nAlive ratio: " + std::to_string(grid.getLivingCells().size() * 100.0 / (grid.getRows() * grid.getCols())) + "%" +
-                        "\nDelay: " + std::to_string(delay) + "ms");
+                        "\nDelay: " + std::to_string(delay) + "ms" + " - Generation: " + std::to_string(generation));
                     text.setCharacterSize(24);
                     text.setFillColor(sf::Color::White);
                     text.setPosition(10, window.getSize().y - 180);
