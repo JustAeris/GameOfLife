@@ -7,7 +7,7 @@ namespace GameOfLife::File {
      * Base interface for a parser
      */
     template<typename T>
-    class BaseParser<T> {
+    class BaseParser {
     public:
         BaseParser() = default;
         virtual ~BaseParser() = default;

@@ -13,7 +13,7 @@ namespace GameOfLife::Game {
      * Abstract class for a grid
      */
     template<typename TGrid, typename T>
-    class BaseGrid<TGrid> : public File::IWritable {
+    class BaseGrid : public File::IWritable {
     public:
         BaseGrid() = default;
         virtual ~BaseGrid() = default;
