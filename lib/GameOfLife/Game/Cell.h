@@ -27,6 +27,7 @@ namespace GameOfLife::Game {
 
         Cell& operator=(bool alive) override;
         bool operator==(const Cell &cell) const;
+        explicit operator bool() const;
     };
 }
 #endif //CELL_H

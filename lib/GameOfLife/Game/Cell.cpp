@@ -82,4 +82,8 @@ namespace GameOfLife::Game {
     bool Cell::operator==(const Cell &cell) const {
         return this->alive == cell.alive && this->obstacle == cell.obstacle;
     }
+
+    Cell::operator bool() const {
+        return alive;
+    }
 }
