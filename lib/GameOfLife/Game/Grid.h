@@ -69,7 +69,7 @@ namespace GameOfLife::Game {
         void setFormatConfig(const File::FormatConfig &formatConfig) { this->formatConfig = formatConfig; }
         [[nodiscard]] File::FormatConfig getFormatConfig() const { return formatConfig; }
 
-        [[nodiscard]] std::string getText() const override = 0;
+        [[nodiscard]] std::string getText() const override;
     };
 
 }
