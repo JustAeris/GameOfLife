@@ -12,7 +12,7 @@ namespace GameOfLife::CLI {
     private:
         static void work(Arguments &args);
     public:
-        static int start(int argc, char *argv[], bool defaultsToInteractive = false);
+        static int start(Arguments arguments, bool defaultsToInteractive = false);
         static void clearScreen();
     };
 }

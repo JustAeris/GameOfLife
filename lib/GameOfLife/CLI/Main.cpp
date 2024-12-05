@@ -15,14 +15,11 @@ namespace GameOfLife::CLI {
     /**
      * Start the CLI application.
      *
-     * @param argc The number of arguments.
-     * @param argv The arguments.
+     * @param arguments Parsed arguments.
      * @param defaultsToInteractive If true, the application will force interactive mode.
      * @return The exit code.
      */
-    int Main::start(int argc, char *argv[], bool defaultsToInteractive) {
-        Arguments arguments = Arguments::parse(argc, argv);
-
+    int Main::start(Arguments arguments, bool defaultsToInteractive) {
         // Check if the arguments are correctly parsed
         if (!arguments.isValid()) {
             return 1;
