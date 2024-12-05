@@ -294,7 +294,7 @@ namespace GameOfLife::Game {
         std::stringstream ss;
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                ss << (cells[i][j].isObstacle ? (cells[i][j] ? livingCells : deadObstacle) :
+                ss << (cells[i][j].isObstacle() ? (cells[i][j] ? livingObstacle : deadObstacle) :
                     (cells[i][j] ? formatConfig.getAliveChar() : formatConfig.getDeadChar()))
                 << formatConfig.getDelimiterChar();
             }
