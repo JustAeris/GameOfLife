@@ -414,10 +414,6 @@ namespace GameOfLife::Game {
         next = cells;
     }
 
-    std::vector<std::vector<bool> > Grid::getCells() const {
-        return cells;
-    }
-
     void Grid::print() const {
         print(0, 0, rows, cols);
     }

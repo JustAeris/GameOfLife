@@ -55,7 +55,7 @@ namespace GameOfLife::Game {
         void print() const override;
         void print(int fromRow, int fromCol, int toRow, int toCol) const override;
 
-        [[nodiscard]] std::vector<std::vector<bool>> getCells() const override;
+        [[nodiscard]] std::vector<std::vector<bool>> getCells() const override { return cells; }
 
         [[nodiscard]] int getRows() const override { return rows; }
         [[nodiscard]] int getCols() const override { return cols; }
