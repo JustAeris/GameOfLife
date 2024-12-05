@@ -95,10 +95,32 @@ namespace GameOfLife::GUI {
                 window.draw(text);
             }
 
+            auto now = std::chrono::system_clock::now();
             if (run) {
                 // Step and draw the grid
-                grid.step();
+                grid.step(warp, dynamic);
+                auto stepTime = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - now).count();
                 drawGrid(window, grid);
+                auto drawTime = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - now).count();
+
+                if (verbose) {
+                    // Print text the frames per second and generation time
+                    sf::Text text;
+                    text.setFont(font);
+                    text.setString("FPS: " + std::to_string(drawTime == 0 ? -1 : 1000000 / drawTime) +
+                        " - Generation time: " + std::to_string(stepTime) + "us" +
+                        "\nGrid size: " + std::to_string(grid.getRows()) + "x" + std::to_string(grid.getCols()) +
+                        "\nLiving cells: " + std::to_string(grid.getLivingCells().size()) +
+                        "\nDead cells: " + std::to_string(grid.getRows() * grid.getCols() - grid.getLivingCells().size()) +
+                        "\nAlive ratio: " + std::to_string(grid.getLivingCells().size() * 100.0 / (grid.getRows() * grid.getCols())) + "%" +
+                        "\nDelay: " + std::to_string(delay) + "ms");
+                    text.setCharacterSize(24);
+                    text.setFillColor(sf::Color::White);
+                    text.setPosition(10, window.getSize().y - 180);
+
+                    window.draw(text);
+                }
+
                 window.display();
             }
 
