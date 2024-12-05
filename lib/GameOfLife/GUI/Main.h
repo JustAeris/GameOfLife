@@ -1,6 +1,7 @@
 #pragma once
 #include "Game/Grid.h"
 #include <SFML/Graphics.hpp>
+#include "CLI/Arguments.h"
 
 namespace GameOfLife::GUI {
 
@@ -9,8 +10,11 @@ namespace GameOfLife::GUI {
         bool run = true;
         int delay = 100;
         bool showHelp = false;
+        CLI::Arguments args;
+        Main() = default;
     public:
-        void start(int argc, char *argv[]);
+        Main(CLI::Arguments args) : args(std::move(args)) { delay = this->args.getDelay(); }
+        void start();
         void drawGrid(sf::RenderWindow &window, Game::Grid &grid, bool drawBorder = false);
     };
 

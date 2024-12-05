@@ -14,14 +14,8 @@
 namespace GameOfLife::GUI {
     /**
      * Start the GUI loop
-     *
-     * @param argc Arguments count
-     * @param argv Arguments
      */
-    void Main::start(int argc, char *argv[]) {
-        // Parse the arguments
-        auto args = CLI::Arguments::parse(argc, argv);
-
+    void Main::start() {
         // If the arguments are invalid or the help flag is set, show the help message
         if (!args.isValid())
             return;
