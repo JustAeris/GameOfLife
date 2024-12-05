@@ -6,13 +6,20 @@ namespace GameOfLife::Game {
     /**
      * Default constructor
      */
-    Cell::Cell() : alive(false) {}
+    Cell::Cell() : alive(false), obstacle(false) {}
 
     /**
      * Base constructor
      * @param alive Alive
      */
-    Cell::Cell(const bool alive) : alive(alive) {}
+    Cell::Cell(const bool alive) : alive(alive), obstacle(false) {}
+
+    /**
+     * Constructor
+     * @param alive Alive
+     * @param obstacle Obstacle
+     */
+    Cell::Cell(bool alive, bool obstacle) : alive(alive), obstacle(obstacle) {}
 
     /**
      * Check if the cell is alive
@@ -31,17 +38,10 @@ namespace GameOfLife::Game {
     }
 
     /**
-     * Toggle cell
-     */
-    void Cell::toggle() {
-        alive = !alive;
-    }
-
-    /**
      * Print the cell
      */
     void Cell::print() const {
-        std::cout << (alive ? "X" : ".");
+        std::cout << (alive ? obstacle ? 'o' : 'x' : obstacle ? 'O' : '.') << " ";
     }
 
     /**
@@ -54,6 +54,14 @@ namespace GameOfLife::Game {
             return livingNeighbors == 2 || livingNeighbors == 3;
         }
         return livingNeighbors == 3;
+    }
+
+    bool Cell::isObstacle() const {
+        return obstacle;
+    }
+
+    void Cell::setObstacle(bool obstacle) {
+        this->obstacle = obstacle;
     }
 
     /**
@@ -72,6 +80,6 @@ namespace GameOfLife::Game {
      * @return Equal
      */
     bool Cell::operator==(const Cell &cell) const {
-        return this->alive == cell.alive;
+        return this->alive == cell.alive && this->obstacle == cell.obstacle;
     }
 }

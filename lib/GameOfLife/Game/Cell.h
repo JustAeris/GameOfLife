@@ -1,26 +1,31 @@
 #ifndef CELL_H
 #define CELL_H
+#include "BaseCell.h"
 
 namespace GameOfLife::Game {
     /**
      * Basic cell implementation, it can be derived to add more complex behavior
      */
-    class Cell {
+    class Cell : public BaseCell {
     private:
         bool alive;
+        bool obstacle;
     public:
         Cell();
         explicit Cell(bool alive);
-        virtual ~Cell() = default;
+        Cell(bool alive, bool obstacle);
+        ~Cell() override = default;
 
-        [[nodiscard]] virtual bool isAlive() const;
-        void setAlive(bool alive);
-        [[nodiscard]] virtual bool willBeAlive(int aliveNeighbours) const;
+        [[nodiscard]] bool isAlive() const override;
+        void setAlive(bool alive) override;
+        [[nodiscard]] bool willBeAlive(int aliveNeighbours) const override;
 
-        void toggle();
-        void print() const;
+        [[nodiscard]] bool isObstacle() const;
+        void setObstacle(bool obstacle);
 
-        Cell& operator=(bool alive);
+        void print() const override;
+
+        Cell& operator=(bool alive) override;
         bool operator==(const Cell &cell) const;
     };
 }
