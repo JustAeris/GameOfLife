@@ -15,7 +15,7 @@ namespace GameOfLife::CLI {
     Arguments Arguments::parse(int argc, char *argv[]) {
         // Check for interactive mode
         if (argc == 1 || (argc == 2 && (strcmp(argv[1], "-i") == 0 || strcmp(argv[1], "--interactive") == 0))) {
-            return {"", "", 1000, 100, false, true, true, false, false, false, '1', '0', ' '};
+            return {"", "", 1000, 100, false, true, true, false, false, false, false, '1', '0', ' '};
         }
 
         // Check for help
@@ -46,9 +46,10 @@ namespace GameOfLife::CLI {
         int generations = 1000;
         int delay = 100;
         bool highPerformance = false;
-        bool endIfStatic = true;
+        bool endIfStatic = false;
         bool interactive = false;
         bool warp = false;
+        bool dynamic = false;
         bool verbose = false;
         bool GUI = false;
         char aliveChar = '1';
@@ -100,6 +101,9 @@ namespace GameOfLife::CLI {
             if (arg == "-w" || arg == "--warp") {
                 warp = true;
             }
+            if (arg == "-y" || arg == "--dynamic") {
+                dynamic = true;
+            }
             if (arg == "-v" || arg == "--verbose") {
                 verbose = true;
             }
@@ -142,7 +146,7 @@ namespace GameOfLife::CLI {
 
         // Return the parsed arguments
         return {inputFile, outputFolder, generations, delay, highPerformance, endIfStatic, interactive,
-            warp, verbose, GUI, aliveChar, deadChar, separator};
+            warp, dynamic, verbose, GUI, aliveChar, deadChar, separator};
     }
 
     /**
@@ -156,7 +160,8 @@ namespace GameOfLife::CLI {
         std::cout << "  -x, --delay <ms>\t\tDelay between generations in milliseconds (default: 100)\n";
         std::cout << "  -p, --high-performance\tUse high performance mode\n";
         std::cout << "  -s, --end-if-static\t\tEnd simulation if the grid is static or does not evolve\n";
-        std::cout << "  -w, --warp\t\t\tWarp around the grid (toroidal grid)\n";
+        std::cout << "  -w, --wrap\t\t\tWarp around the grid (toroidal grid)\n";
+        std::cout << "  -y, --dynamic\t\t\tDynamic grid size (takes priority on wrap)\n";
         std::cout << "  -v, --verbose\t\t\tDisplay extended informations\n";
         std::cout << "  -a, --alive-char <c>\t\tCharacter to represent alive cells (default: 1, unused if file is .cells or .rle)\n";
         std::cout << "  -d, --dead-char <c>\t\tCharacter to represent dead cells (default: 0, unused if file is .cells or .rle)\n";
