@@ -7,9 +7,9 @@ namespace GameOfLife::Game {
      */
     class BaseCell {
     private:
-        bool alive;
+        bool alive = false;
     public:
-        BaseCell();
+        BaseCell() = default;
         explicit BaseCell(bool alive);
         virtual ~BaseCell() = default;
 
