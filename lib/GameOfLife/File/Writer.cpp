@@ -21,6 +21,7 @@ namespace GameOfLife::File {
             throw std::runtime_error("Could not open file");
         }
 
+        file << "\xEF\xBB\xBF"; // Forces UTF-8
         const auto text = data.getText();
         file << text;
         file.close();
