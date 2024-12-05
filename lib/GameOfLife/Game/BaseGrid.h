@@ -72,7 +72,7 @@ namespace GameOfLife::Game {
 
         void resize(std::vector<std::vector<T>> &grid, std::vector<std::vector<T>> &next,
             std::unordered_set<std::pair<int, int>, HashFunction> &livingCells,
-            int addNorth, int addEast, int addSouth, int addWest, int rows, int cols, int maxRows, int maxCols) {
+            int addNorth, int addEast, int addSouth, int addWest, int &rows, int &cols, int maxRows, int maxCols) {
             // Argument check
             if (addNorth < 0 || addEast < 0 || addSouth < 0 || addWest < 0) {
                 throw std::invalid_argument("The number of rows and columns to add must be positive.");
@@ -156,7 +156,7 @@ namespace GameOfLife::Game {
                     }
                 }
             }
-    }
+        }
     };
 }
 
