@@ -1,25 +1,22 @@
 #include "Grid.h"
 
 #include <iostream>
+#include <sstream>
 #include <thread>
 
 #include "HashFunction.h"
 
 namespace GameOfLife::Game {
-    Grid::Grid(int rows, int cols, int maxRows, int maxCols, bool isDynamic) :
+    Grid::Grid(const int rows, const int cols, const int maxRows, const int maxCols, const bool isDynamic) :
     rows(rows), cols(cols), maxRows(maxRows), maxCols(maxCols), isDynamic(isDynamic) {
         cells.resize(rows, std::vector<bool>(cols));
         next = cells;
-
-        isMultiThreaded = false;
     }
 
-    Grid::Grid(const std::vector<std::vector<bool>> &cells, int rows, int cols, int maxRows, int maxCols, bool isDynamic) :
+    Grid::Grid(const std::vector<std::vector<bool>> &cells, const int rows, const int cols, const int maxRows, const int maxCols, const bool isDynamic) :
     rows(rows), cols(cols), maxRows(maxRows), maxCols(maxCols), isDynamic(isDynamic) {
         this->cells = cells;
         next = cells;
-
-        isMultiThreaded = false;
 
         // Populate living cells
         for (int i = 0; i < rows; i++) {
@@ -32,32 +29,7 @@ namespace GameOfLife::Game {
         changedCells = livingCells;
     }
 
-    Grid::Grid(const std::vector<std::vector<Cell> > &cells, int rows, int cols, int maxRows, int maxCols, bool isDynamic) :
-    rows(rows), cols(cols), maxRows(maxRows), maxCols(maxCols), isDynamic(isDynamic) {
-        // Initialize the cells
-        this->cells.resize(rows, std::vector<bool>(cols));
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                this->cells[i][j] = cells[i][j].isAlive();
-            }
-        }
-        next = this->cells;
-
-        isMultiThreaded = false;
-
-        // Initialize living cells
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                if (this->cells[i][j])
-                    livingCells.insert(std::make_pair(i, j));
-            }
-        }
-
-        changedCells = livingCells;
-    }
-
-
-    void Grid::setAlive(int row, int col, bool alive) {
+    void Grid::setAlive(int row, int col, const bool alive) {
         cells[row][col] = alive;
         if (alive)
             livingCells.insert(std::make_pair(row, col));
@@ -65,7 +37,7 @@ namespace GameOfLife::Game {
             livingCells.erase(std::make_pair(row, col));
     }
 
-    void Grid::setAliveNext(int row, int col, bool alive) {
+    void Grid::setAliveNext(int row, int col, const bool alive) {
         next[row][col] = alive;
         if (alive)
             livingCells.emplace(row, col);
@@ -76,15 +48,11 @@ namespace GameOfLife::Game {
     }
 
 
-    bool Grid::isAlive(int row, int col) const {
+    bool Grid::isAlive(const int row, const int col) const {
         return cells[row][col];
     }
 
-    void Grid::toggle(int row, int col) {
-        cells[row][col] = !cells[row][col];
-    }
-
-    int Grid::countNeighbors(int row, int col, bool wrap) const {
+    int Grid::countNeighbors(const int row, const int col, const bool wrap) const {
         int count = 0;
 
         for (int i = row - 1; i <= row + 1; i++) {
@@ -93,8 +61,8 @@ namespace GameOfLife::Game {
                     continue;
                 }
 
-                int wrappedRow = wrap ? (i + rows) % rows : i;
-                int wrappedCol = wrap ? (j + cols) % cols : j;
+                const int wrappedRow = wrap ? (i + rows) % rows : i;
+                const int wrappedCol = wrap ? (j + cols) % cols : j;
 
                 if (wrappedRow >= 0 && wrappedRow < rows && wrappedCol >= 0 && wrappedCol < cols) {
                     count += cells[wrappedRow][wrappedCol];
@@ -111,7 +79,7 @@ namespace GameOfLife::Game {
      * @param wrap If true, the grid will wrap around the edges. This will disable dynamic resizing.
      * @param dynamic If true, the grid will resize if a living cell is on the edge (overrides isDynamic property).
      */
-    void Grid::step(bool wrap, bool dynamic) {
+    void Grid::step(const bool wrap, const bool dynamic) {
         // Clear the changed cells
         changedCells.clear();
 
@@ -192,15 +160,17 @@ namespace GameOfLife::Game {
     }
 
     void Grid::step() {
-        step(false);
+        step(false, false);
+    }
+
+    void Grid::step(const bool wrap) {
+        step(wrap, false);
     }
 
 
-    void Grid::multiThreadedStep(bool wrap) {
+    void Grid::multiThreadedStep(const bool wrap) {
         // Assume that the size check has already been done
-
-        // Clear the changed cells
-        changedCells.clear();
+        // TODO: Add mutexes to prevent concurrent access to the living cells set
 
         // Directions to check
         const std::pair<int, int> directions[] = {
@@ -213,7 +183,7 @@ namespace GameOfLife::Game {
         std::mutex cellsToCheckMutex;
 
         // Function to process a chunk of living cells
-        auto checkCells = [&](int start, int end) {
+        auto checkCells = [&](const int start, const int end) {
             for (int idx = start; idx < end; ++idx) {
                 auto cell = *std::next(livingCells.begin(), idx);
                 const int row = cell.first;
@@ -247,7 +217,7 @@ namespace GameOfLife::Game {
 
         // Check each cell
         // Function to update a chunk of cells
-        auto updateCells = [&](int start, int end) {
+        auto updateCells = [&](const int start, const int end) {
             for (int idx = start; idx < end; ++idx) {
                 auto cell = *std::next(cellsToCheck.begin(), idx);
                 const int row = cell.first;
@@ -294,7 +264,7 @@ namespace GameOfLife::Game {
     }
 
 
-    void Grid::move(int fromRow, int fromCol, int numRows, int numCols, int toRow, int toCol) {
+    void Grid::move(const int fromRow, const int fromCol, const int numRows, const int numCols, const int toRow, const int toCol) {
         // Extract the submatrix
         std::vector submatrix(numRows, std::vector<bool>(numCols));
         for (int i = 0; i < numRows; ++i) {
@@ -330,7 +300,7 @@ namespace GameOfLife::Game {
 
 
 
-    void Grid::resize(int addNorth, int addEast, int addSouth, int addWest) {
+    void Grid::resize(const int addNorth, const int addEast, const int addSouth, const int addWest) {
         // Argument check
         if (addNorth < 0 || addEast < 0 || addSouth < 0 || addWest < 0) {
             throw std::invalid_argument("The number of rows and columns to add must be positive.");
@@ -389,7 +359,7 @@ namespace GameOfLife::Game {
      * @param col The column to insert the pattern at
      * @param hollow If true, only the living cells will be inserted
      */
-    void Grid::insert(const std::vector<std::vector<bool>> &cells, int row, int col, bool hollow) {
+    void Grid::insert(const std::vector<std::vector<bool>> &cells, const int row, const int col, const bool hollow) {
         // Argument check
         if (row < 0 || row >= rows || col < 0 || col >= cols) {
             throw std::invalid_argument("The row and column must be within the grid.");
@@ -421,10 +391,15 @@ namespace GameOfLife::Game {
     }
 
 
-    void Grid::randomize() {
+    void Grid::randomize(const float aliveProbability) {
+        if (aliveProbability < 0 || aliveProbability > 1)
+            return;
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                setAlive(i, j, rand() % 2);
+                if ((rand() % 100) < aliveProbability * 100) {
+                    setAlive(i, j, true);
+                    changedCells.insert(std::make_pair(i, j));
+                }
             }
         }
     }
@@ -436,19 +411,10 @@ namespace GameOfLife::Game {
             changedCells.insert(cell);
         }
         livingCells.clear();
+        next = cells;
     }
 
-    std::vector<std::vector<Cell> > Grid::getCells() const {
-        std::vector baseCells(rows, std::vector<Cell>(cols));
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                baseCells[i][j] = Cell(cells[i][j]);
-            }
-        }
-        return baseCells;
-    }
-
-    std::vector<std::vector<bool> > Grid::toBooleanGrid() const {
+    std::vector<std::vector<bool> > Grid::getCells() const {
         return cells;
     }
 
@@ -456,7 +422,7 @@ namespace GameOfLife::Game {
         print(0, 0, rows, cols);
     }
 
-    void Grid::print(int fromRow, int fromCol, int toRow, int toCol) const {
+    void Grid::print(const int fromRow, const int fromCol, const int toRow, const int toCol) const {
         for (int i = fromRow; i < toRow; i++) {
             for (int j = fromCol; j < toCol; j++) {
                 std::cout << (cells[i][j] ? 'O' : '.') << ' ';
@@ -464,5 +430,17 @@ namespace GameOfLife::Game {
             std::cout << std::endl;
         }
     }
+
+    std::string Grid::getText() const {
+        std::stringstream ss;
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                ss << (cells[i][j] ? formatConfig.getAliveChar() : formatConfig.getDeadChar()) << formatConfig.getDelimiterChar();
+            }
+            ss << '\n';
+        }
+        return ss.str();
+    }
+
 
 }

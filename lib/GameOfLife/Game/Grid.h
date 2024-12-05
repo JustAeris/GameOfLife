@@ -5,13 +5,14 @@
 
 #include "BaseGrid.h"
 #include "HashFunction.h"
+#include "File/FormatConfig.h"
 
 #define DEFAULT_MAX_ROWS 2048
 #define DEFAULT_MAX_COLS 2048
 
 namespace GameOfLife::Game {
 
-    class Grid {
+    class Grid : public BaseGrid<std::vector<std::vector<bool>>> {
     private:
         std::vector<std::vector<bool>> cells;
         std::vector<std::vector<bool>> next;
@@ -22,50 +23,53 @@ namespace GameOfLife::Game {
         int maxRows;
         int maxCols;
 
-        bool isMultiThreaded;
-        int multiThreadedThreshold;
-
+        int multiThreadedThreshold = 1000;
         bool isDynamic;
+
+        File::FormatConfig formatConfig = File::FormatConfig('O', '.', '\0');
 
         void setAliveNext(int row, int col, bool alive);
         void multiThreadedStep(bool wrap);
 
     public:
+        Grid() = delete;
         Grid(int rows, int cols, int maxRows = DEFAULT_MAX_ROWS, int maxCols = DEFAULT_MAX_COLS, bool isDynamic = true);
         Grid(const std::vector<std::vector<bool>> &cells, int rows, int cols, int maxRows = DEFAULT_MAX_ROWS,
             int maxCols = DEFAULT_MAX_COLS, bool isDynamic = true);
-        Grid(const std::vector<std::vector<Cell>> &cells, int rows, int cols, int maxRows = DEFAULT_MAX_ROWS,
-            int maxCols = DEFAULT_MAX_COLS, bool isDynamic = true);
-        ~Grid() = default;
+        ~Grid() override = default;
 
-        void setAlive(int row, int col, bool alive);
-        [[nodiscard]] bool isAlive(int row, int col) const;
-        [[nodiscard]] int countNeighbors(int row, int col, bool wrap) const;
-        void toggle(int row, int col);
+        void setAlive(int row, int col, bool alive) override;
+        [[nodiscard]] bool isAlive(int row, int col) const override;
+        [[nodiscard]] int countNeighbors(int row, int col, bool wrap) const override;
 
-        void step();
+        void step() override;
+        void step(bool wrap) override;
         void step(bool wrap, bool dynamic = true);
-        void randomize();
-        void clear();
+        void randomize(float aliveProbability) override;
+        void clear() override;
 
         void move(int fromRow, int fromCol, int numRows, int numCols, int toRow, int toCol);
         void resize(int addNorth, int addEast, int addSouth, int addWest);
         void insert(const std::vector<std::vector<bool>> &cells, int row, int col, bool hollow = false);
 
-        void print() const;
-        void print(int fromRow, int fromCol, int toRow, int toCol) const;
+        void print() const override;
+        void print(int fromRow, int fromCol, int toRow, int toCol) const override;
 
-        [[nodiscard]] std::vector<std::vector<Cell>> getCells() const;
-        [[nodiscard]] std::vector<std::vector<bool>> toBooleanGrid() const;
+        [[nodiscard]] std::vector<std::vector<bool>> getCells() const override;
 
-        [[nodiscard]] int getRows() const { return rows; }
-        [[nodiscard]] int getCols() const { return cols; }
+        [[nodiscard]] int getRows() const override { return rows; }
+        [[nodiscard]] int getCols() const override { return cols; }
 
         [[nodiscard]] int getMaxRows() const { return maxRows; }
         [[nodiscard]] int getMaxCols() const { return maxCols; }
 
         [[nodiscard]] std::unordered_set<std::pair<int, int>, HashFunction> getLivingCells() const { return livingCells; }
         [[nodiscard]] std::unordered_set<std::pair<int, int>, HashFunction> getChangedCells() const { return changedCells; }
+
+        void setFormatConfig(const File::FormatConfig &formatConfig) { this->formatConfig = formatConfig; }
+        [[nodiscard]] File::FormatConfig getFormatConfig() const { return formatConfig; }
+
+        [[nodiscard]] std::string getText() const override = 0;
     };
 
 }
