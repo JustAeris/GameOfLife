@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <numeric>
 
+#include "CLI/Main.h"
 #include "File/Parser.h"
 #include "File/Writer.h"
 #include "Game/ExtendedGrid.h"
@@ -173,41 +174,13 @@ void writerTest() {
 }
 
 int main(int argc, char *argv[]) {
-    // chronoTest(true);
-    // sizeTest();
-    // regularTest();
-    // parserTest();
-    // writerTest();
+    auto args = GameOfLife::CLI::Arguments::parse(argc, argv);
 
-    // GameOfLife::CLI::Main::start(argc, argv, false);
-
-    GameOfLife::GUI::Main::start(argc, argv);
-
-    GameOfLife::Game::Grid grid(3, 3);
-
-    // Blinker
-    grid.setAlive(1, 0, true);
-    grid.setAlive(1, 1, true);
-    grid.setAlive(1, 2, true);
-
-    grid.print();
-
-    grid.step();
-
-    grid.print();
-
-    grid.step();
-
-    grid.print();
-
-    auto now = std::chrono::high_resolution_clock::now();
-    for (int i = 0; i < 1; ++i) {
-        grid.step();
-    }
-    auto end = std::chrono::high_resolution_clock::now();
-
-    grid.print();
-    std::cout << "Time: " << std::chrono::duration_cast<std::chrono::microseconds>(end - now).count() << " microseconds" << std::endl;
+    if (args.isGUI()) {
+        GameOfLife::GUI::Main gui(args);
+        gui.start();
+    } else
+        GameOfLife::CLI::Main::start(args);
 
     return 0;
 }
