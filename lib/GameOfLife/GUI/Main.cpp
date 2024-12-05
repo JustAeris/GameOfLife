@@ -37,6 +37,11 @@ namespace GameOfLife::GUI {
         sf::RenderTexture renderTexture;
         renderTexture.create(window.getSize().x, window.getSize().y);
 
+        sf::Font font;
+        if (!font.loadFromFile(R"(C:\Users\matth\CLionProjects\GameOfLife-GroupA\cmake-build-debug\Ubuntu-Regular.ttf)")) {
+            std::cerr << "Error loading font" << std::endl;
+        }
+
         while (window.isOpen()) {
             sf::Event event{};
             while (window.pollEvent(event)) {
