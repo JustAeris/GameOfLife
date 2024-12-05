@@ -31,15 +31,13 @@ namespace GameOfLife::GUI {
         int cols = 0;
         auto cells = parser.parse(args.getInputFile(), rows, cols);
 
-        Game::Grid grid(cells, rows, cols);
-
         // Get the screen resolution
         sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
 
         // Create the window
         sf::RenderWindow window(sf::VideoMode(desktop.width * 0.9, desktop.height * 0.8), "Game Of Life", sf::Style::Close);
 
-
+        Game::Grid grid(cells, rows, cols, window.getSize().y - 1, window.getSize().x - 1);
 
         while (window.isOpen()) {
             sf::Event event{};
@@ -84,7 +82,7 @@ namespace GameOfLife::GUI {
             window.display();
 
             // Sleep
-            sf::sleep(sf::milliseconds(1));
+            sf::sleep(sf::milliseconds(100));
         }
     }
 }
