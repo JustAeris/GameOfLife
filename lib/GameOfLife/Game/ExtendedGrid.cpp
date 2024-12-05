@@ -1,210 +1,306 @@
 #include "ExtendedGrid.h"
 #include <iostream>
+#include <mutex>
+#include <sstream>
+#include <thread>
 
 
 namespace GameOfLife::Game {
-    /**
-     * Base constructor
-     * @param rows No of rows
-     * @param cols No of columns
-     */
-    ExtendedGrid::ExtendedGrid(const int rows, const int cols) : rows(rows), cols(cols) {
+    ExtendedGrid::ExtendedGrid(const int rows, const int cols, const int maxRows, const int maxCols, const bool isDynamic) :
+    rows(rows), cols(cols), maxRows(maxRows), maxCols(maxCols), isDynamic(isDynamic) {
         cells.resize(rows, std::vector<Cell>(cols));
         next = cells;
     }
 
-    /**
-     * Constructor with cells
-     * @param cells Cells
-     * @param rows No of rows
-     * @param cols No of columns
-     */
-    ExtendedGrid::ExtendedGrid(const std::vector<std::vector<Cell>> &cells, const int rows, const int cols) : rows(rows),
-        cols(cols) {
+    ExtendedGrid::ExtendedGrid(const std::vector<std::vector<Cell>> &cells, const int rows, const int cols, const int maxRows, const int maxCols, const bool isDynamic) :
+    rows(rows), cols(cols), maxRows(maxRows), maxCols(maxCols), isDynamic(isDynamic) {
         this->cells = cells;
         next = cells;
-    }
 
-    /**
-     * Print the grid
-     */
-    void ExtendedGrid::print() const {
-        print(0, 0, rows, cols);
-    }
-
-    /**
-     * Print the grid from a specific range
-     * @param fromRow Start row
-     * @param fromCol Start column
-     * @param toRow End row
-     * @param toCol End column
-     */
-    void ExtendedGrid::print(const int fromRow, const int fromCol, const int toRow, const int toCol) const {
-        for (int i = fromRow; i < toRow; i++) {
-            for (int j = fromCol; j < toCol; j++) {
-                cells[i][j].print();
-                std::cout << " ";
+        // Populate living cells
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                if (cells[i][j].isAlive())
+                    livingCells.insert(std::make_pair(i, j));
             }
-            std::cout << std::endl;
         }
-        std::cout << std::endl;
+
+        changedCells = livingCells;
     }
 
-    /**
-     * Print the grid with a specific format
-     * @param format Format
-     */
-    void ExtendedGrid::print(File::FormatConfig &format) const {
-        print(format, 0, 0, rows, cols);
+    void ExtendedGrid::setAlive(int row, int col, const bool alive) {
+        cells[row][col] = alive;
+        if (alive)
+            livingCells.insert(std::make_pair(row, col));
+        else
+            livingCells.erase(std::make_pair(row, col));
     }
 
-    /**
-     * Print the grid with a specific format from a specific range
-     * @param format Format
-     * @param fromRow Start row
-     * @param fromCol Start column
-     * @param toRow End row
-     * @param toCol End column
-     */
-    void ExtendedGrid::print(File::FormatConfig &format, int fromRow, int fromCol, int toRow, int toCol) const {
-        for (int i = fromRow; i < toRow; i++) {
-            for (int j = fromCol; j < toCol; j++) {
-                std::cout << (cells[i][j].isAlive() ? format.getAliveChar() : format.getDeadChar());
-                if (j < toCol - 1) {
-                    std::cout << format.getDelimiterChar();
-                }
-            }
-            std::cout << std::endl;
-        }
-        std::cout << std::endl;
+    void ExtendedGrid::setAliveNext(int row, int col, const bool alive) {
+        next[row][col] = alive;
+        if (alive)
+            livingCells.emplace(row, col);
+        else
+            livingCells.erase(std::make_pair(row, col));
+
+        changedCells.emplace(row, col);
     }
 
-    /**
-     * Set cell alive
-     * @param row Row
-     * @param col Column
-     * @param alive Alive
-     */
-    void ExtendedGrid::setAlive(const int row, const int col, const bool alive) {
-        cells[row][col].setAlive(alive);
-    }
-
-    /**
-     * Toggle cell
-     * @param row Row
-     * @param col Column
-     */
-    void ExtendedGrid::toggle(const int row, const int col) {
-        cells[row][col].toggle();
-    }
-
-    /**
-     * Check if the cell is alive
-     * @param row Row
-     * @param col Column
-     * @return Alive
-     */
     bool ExtendedGrid::isAlive(const int row, const int col) const {
         return cells[row][col].isAlive();
     }
 
-    /**
-     * Count living neighbors
-     * @param row Row
-     * @param col Column
-     * @param wrap Wrap, if true, the grid is considered to be a torus
-     * @return Living neighbors
-     */
-    [[nodiscard]]
-    int ExtendedGrid::countNeighbors(const int row, const int col, bool wrap) const {
+    int ExtendedGrid::countNeighbors(const int row, const int col, const bool wrap) const {
         int count = 0;
-        const int rowStart = row - 1;
-        const int rowEnd = row + 1;
-        const int colStart = col - 1;
-        const int colEnd = col + 1;
 
-        for (int i = rowStart; i <= rowEnd; i++) {
-            for (int j = colStart; j <= colEnd; j++) {
-                // Skip the cell itself
+        for (int i = row - 1; i <= row + 1; i++) {
+            for (int j = col - 1; j <= col + 1; j++) {
                 if (i == row && j == col) {
                     continue;
                 }
-                // If wrap is true, the grid is considered to be a torus
-                int wrappedRow = wrap ? (i + rows) % rows : i;
-                int wrappedCol = wrap ? (j + cols) % cols : j;
+
+                const int wrappedRow = wrap ? (i + rows) % rows : i;
+                const int wrappedCol = wrap ? (j + cols) % cols : j;
+
                 if (wrappedRow >= 0 && wrappedRow < rows && wrappedCol >= 0 && wrappedCol < cols) {
                     count += cells[wrappedRow][wrappedCol].isAlive();
                 }
             }
         }
+
         return count;
     }
 
-    /**
-     * Step the grid
-     * @param wrap Wrap, if true, the grid is considered to be a torus
-     */
+    void ExtendedGrid::step(const bool wrap, const bool dynamic) {
+        // Clear the changed cells
+        changedCells.clear();
+
+        // Check if the grid should be resized
+        if (isDynamic && !wrap && dynamic) {
+            // Check if a living cell is on the edge
+            bool onEdgeNorth = false, onEdgeEast = false, onEdgeSouth = false, onEdgeWest = false;
+            for (auto &cell : livingCells) {
+                if (cell.first == 0) {
+                    onEdgeNorth = true;
+                } else if (cell.first == rows - 1) {
+                    onEdgeSouth = true;
+                } else if (cell.second == 0) {
+                    onEdgeWest = true;
+                } else if (cell.second == cols - 1) {
+                    onEdgeEast = true;
+                }
+            }
+            resize(onEdgeNorth ? 1 : 0, onEdgeEast ? 1 : 0, onEdgeSouth ? 1 : 0, onEdgeWest ? 1 : 0);
+        }
+
+        if (livingCells.size() > multiThreadedThreshold) {
+            // multiThreadedStep(wrap);
+            // return;
+        }
+
+        const std::pair<int, int> directions[] = {
+            { -1, -1 }, { -1, 0 }, { -1, 1 },
+            { 0, -1 }, {0, 0}, { 0, 1 },
+            { 1, -1 }, { 1, 0 }, { 1, 1 }
+        };
+
+        auto cellsToCheck = std::unordered_set<std::pair<int, int>, HashFunction>();
+
+        for (auto &cell : livingCells) {
+            const int row = cell.first;
+            const int col = cell.second;
+
+            for (auto &direction : directions) {
+                const int newRow = row + direction.first;
+                const int newCol = col + direction.second;
+
+                if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols) {
+                    cellsToCheck.insert(std::make_pair(newRow, newCol));
+                }
+            }
+        }
+
+        // Check each cell
+        for (auto &cell : cellsToCheck) {
+            const int row = cell.first;
+            const int col = cell.second;
+
+            const int neighbors = countNeighbors(row, col, wrap);
+
+            setAliveNext(row, col, cells[row][col].willBeAlive(neighbors));
+        }
+
+        // Move the next generation to the current generation
+        cells = next;
+
+        // Clear the next generation
+        for (auto &cell : livingCells) {
+            next[cell.first][cell.second] = false;
+        }
+    }
+
     void ExtendedGrid::step(const bool wrap) {
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                const int aliveNeighbours = countNeighbors(i, j, wrap);
-                next[i][j].setAlive(cells[i][j].willBeAlive(aliveNeighbours));
-            }
-        }
-
-        std::swap(cells, next);
+        step(wrap, !wrap);
     }
 
-    /**
-     * Step the grid
-     */
     void ExtendedGrid::step() {
-        step(false);
+        step(false, true);
+    }
+
+    void ExtendedGrid::multiThreadedStep(const bool wrap) {
+        // Assume that the size check has already been done
+        // TODO: Add mutexes to prevent concurrent access to the living cells set
+
+        // Directions to check
+        const std::pair<int, int> directions[] = {
+            { -1, -1 }, { -1, 0 }, { -1, 1 },
+            { 0, -1 }, { 0, 0 }, { 0, 1 },
+            { 1, -1 }, { 1, 0 }, { 1, 1 }
+        };
+
+        auto cellsToCheck = std::unordered_set<std::pair<int, int>, HashFunction>();
+        std::mutex cellsToCheckMutex;
+
+        // Function to process a chunk of living cells
+        auto checkCells = [&](const int start, const int end) {
+            for (int idx = start; idx < end; ++idx) {
+                auto cell = *std::next(livingCells.begin(), idx);
+                const int row = cell.first;
+                const int col = cell.second;
+
+                for (auto &direction : directions) {
+                    const int newRow = row + direction.first;
+                    const int newCol = col + direction.second;
+
+                    if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols) {
+                        std::lock_guard lock(cellsToCheckMutex);
+                        cellsToCheck.insert(std::make_pair(newRow, newCol));
+                    }
+                }
+            }
+        };
+
+        int numThreads = std::thread::hardware_concurrency();
+        int cellsPerThread = livingCells.size() / numThreads;
+        std::vector<std::thread> threads;
+
+        for (int i = 0; i < numThreads; ++i) {
+            int start = i * cellsPerThread;
+            int end = (i == numThreads - 1) ? livingCells.size() : start + cellsPerThread;
+            threads.emplace_back(checkCells, start, end);
+        }
+
+        for (auto &thread : threads) {
+            thread.join();
+        }
+
+        // Check each cell
+        // Function to update a chunk of cells
+        auto updateCells = [&](const int start, const int end) {
+            for (int idx = start; idx < end; ++idx) {
+                auto cell = *std::next(cellsToCheck.begin(), idx);
+                const int row = cell.first;
+                const int col = cell.second;
+
+                const int neighbors = countNeighbors(row, col, wrap);
+
+                setAliveNext(row, col, cells[row][col].willBeAlive(neighbors));
+            }
+        };
+
+        cellsPerThread = cellsToCheck.size() / numThreads;
+        threads.clear();
+
+        for (int i = 0; i < numThreads; ++i) {
+            int start = i * cellsPerThread;
+            int end = (i == numThreads - 1) ? cellsToCheck.size() : start + cellsPerThread;
+            threads.emplace_back(updateCells, start, end);
+        }
+
+        for (auto &thread : threads) {
+            thread.join();
+        }
+
+        // Move the next generation to the current generation
+        cells = next;
+
+        // Clear the next generation
+        for (auto &cell : livingCells) {
+            next[cell.first][cell.second] = false;
+        }
+    }
+
+
+    void ExtendedGrid::move(const int fromRow, const int fromCol, const int numRows, const int numCols, const int toRow, const int toCol) {
+        BaseGrid::move(cells, livingCells, changedCells, fromRow, fromCol, numRows, numCols, toRow, toCol);
+    }
+
+
+
+    void ExtendedGrid::resize(const int addNorth, const int addEast, const int addSouth, const int addWest) {
+        BaseGrid::resize(cells, next, livingCells, addNorth, addEast, addSouth, addWest, rows, cols, maxRows, maxCols);
     }
 
     /**
-     * Randomize the grid
+     * Inserts a pattern into the grid.
+     *
+     * @param cells The pattern to insert
+     * @param row The row to insert the pattern at
+     * @param col The column to insert the pattern at
+     * @param hollow If true, only the living cells will be inserted
      */
-    void ExtendedGrid::randomize() {
+    void ExtendedGrid::insert(const std::vector<std::vector<Cell>> &cells, const int row, const int col, const bool hollow) {
+        BaseGrid::insert(this->cells, livingCells, changedCells, cells, row, col, rows, cols, maxRows, maxCols, hollow);
+    }
+
+
+    void ExtendedGrid::randomize(const float aliveProbability) {
+        if (aliveProbability < 0 || aliveProbability > 1)
+            return;
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                cells[i][j].setAlive(rand() % 2 == 0);
+                if ((rand() % 100) < aliveProbability * 100) {
+                    setAlive(i, j, true);
+                    changedCells.insert(std::make_pair(i, j));
+                }
             }
         }
     }
 
-    /**
-     * Clear the grid
-     */
     void ExtendedGrid::clear() {
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                cells[i][j].setAlive(false);
+        // Clear the living cells
+        for (auto &cell : livingCells) {
+            setAlive(cell.first, cell.second, false);
+            changedCells.insert(cell);
+        }
+        livingCells.clear();
+        next = cells;
+    }
+
+    void ExtendedGrid::print() const {
+        print(0, 0, rows, cols);
+    }
+
+    void ExtendedGrid::print(const int fromRow, const int fromCol, const int toRow, const int toCol) const {
+        for (int i = fromRow; i < toRow; i++) {
+            for (int j = fromCol; j < toCol; j++) {
+                std::cout << (cells[i][j] ? formatConfig.getAliveChar() : formatConfig.getDeadChar()) << formatConfig.getDelimiterChar();
             }
+            std::cout << std::endl;
         }
     }
 
-    /**
-     * Get the cells
-     * @return Cells
-     */
-    [[nodiscard]]
-    std::vector<std::vector<Cell> > ExtendedGrid::getCells() const {
-        return cells;
-    }
-
-    /**
-     * Convert the grid to a boolean grid
-     * @return Boolean grid
-     */
-    [[nodiscard]]
-    std::vector<std::vector<bool>> ExtendedGrid::toBooleanGrid() const {
-        std::vector boolGrid(rows, std::vector<bool>(cols));
+    std::string ExtendedGrid::getText() const {
+        std::stringstream ss;
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                boolGrid[i][j] = cells[i][j].isAlive();
+                ss << (cells[i][j].isObstacle ? (cells[i][j] ? livingCells : deadObstacle) :
+                    (cells[i][j] ? formatConfig.getAliveChar() : formatConfig.getDeadChar()))
+                << formatConfig.getDelimiterChar();
             }
+            ss << '\n';
         }
-        return boolGrid;
+        return ss.str();
     }
+
 }
