@@ -18,14 +18,19 @@ namespace GameOfLife::GUI {
         text.setFont(font);
         auto ss = std::stringstream();
         ss << "Space - Start/Stop\n"
-           << "R - Randomize\n"
-           << "C - Clear\n"
-           << "S - Step\n"
-           << "Up/Down - Speed\n"
-           << "Escape - Exit\n"
-           << "V - Verbose " << (verbose ? "(On)" : "(Off)")
-           << "\nW - Wrap " << (warp ? "(On)" : "(Off)")
-           << "\nD - Dynamic " << (dynamic ? "(On)" : "(Off)");
+            << "R - Randomize\n"
+            << "C - Clear\n"
+            << "S - Step\n"
+            << "Up/Down - Speed\n"
+            << "Escape - Exit\n"
+            << "V - Verbose " << (verbose ? "(On)" : "(Off)")
+            << "\nW - Wrap " << (warp ? "(On)" : "(Off)")
+            << "\nD - Dynamic " << (dynamic ? "(On)" : "(Off)")
+            << "\n\nB - Insert Blinker\n"
+            << "G - Insert Glider\n"
+            << "P - Insert Pulsar\n"
+            << "M - Insert MWSS\n"
+            << "O - Insert Gosper Glider Gun\n";
         text.setString(ss.str());
         text.setCharacterSize(24);
         text.setFillColor(sf::Color::White);
@@ -66,7 +71,7 @@ namespace GameOfLife::GUI {
         sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
 
         // Create the window
-        sf::RenderWindow window(sf::VideoMode(desktop.width * 0.9, desktop.height * 0.8), "Game Of Life", sf::Style::Close);
+        sf::RenderWindow window(sf::VideoMode(desktop.width * 0.9, desktop.height * 0.8), "Game Of Life - Press H for help", sf::Style::Close);
 
         sf::Font font;
         if (!font.loadFromFile(File::Utils::makeAbsolutePath("Ubuntu-Regular.ttf").string())) {
@@ -169,11 +174,39 @@ namespace GameOfLife::GUI {
                             warp = false;
                     }
 
+                    if (event.key.code == sf::Keyboard::B) {
+                        // Parse blinker.rle and insert it into the grid where the mouse is
+                        auto mousePos = sf::Mouse::getPosition(window);
+                        auto [gridRow, gridCols] = mousePosToGridPos(window, grid, mousePos.x, mousePos.y);
+                        insertPattern(grid, File::Utils::makeAbsolutePath("Patterns/blinker.rle").string(), gridRow, gridCols);
+                    }
+
                     if (event.key.code == sf::Keyboard::G) {
                         // Parse glider.rle and insert it into the grid where the mouse is
                         auto mousePos = sf::Mouse::getPosition(window);
                         auto [gridRow, gridCols] = mousePosToGridPos(window, grid, mousePos.x, mousePos.y);
                         insertPattern(grid, File::Utils::makeAbsolutePath("Patterns/glider.rle").string(), gridRow, gridCols);
+                    }
+
+                    if (event.key.code == sf::Keyboard::P) {
+                        // Parse pulsar.rle and insert it into the grid where the mouse is
+                        auto mousePos = sf::Mouse::getPosition(window);
+                        auto [gridRow, gridCols] = mousePosToGridPos(window, grid, mousePos.x, mousePos.y);
+                        insertPattern(grid, File::Utils::makeAbsolutePath("Patterns/pulsar.rle").string(), gridRow, gridCols);
+                    }
+
+                    if (event.key.code == sf::Keyboard::M) {
+                        // Parse mwss.rle and insert it into the grid where the mouse is
+                        auto mousePos = sf::Mouse::getPosition(window);
+                        auto [gridRow, gridCols] = mousePosToGridPos(window, grid, mousePos.x, mousePos.y);
+                        insertPattern(grid, File::Utils::makeAbsolutePath("Patterns/mwss.rle").string(), gridRow, gridCols);
+                    }
+
+                    if (event.key.code == sf::Keyboard::O) {
+                        // Parse gosperglidergun.rle and insert it into the grid where the mouse is
+                        auto mousePos = sf::Mouse::getPosition(window);
+                        auto [gridRow, gridCols] = mousePosToGridPos(window, grid, mousePos.x, mousePos.y);
+                        insertPattern(grid, File::Utils::makeAbsolutePath("Patterns/gosperglidergun.rle").string(), gridRow, gridCols);
                     }
                 }
             }
