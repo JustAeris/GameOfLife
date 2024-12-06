@@ -4,6 +4,8 @@
 #include <fstream>
 #include <cstring>
 
+#include "File/Utils.h"
+
 namespace GameOfLife::CLI {
     /**
      * Parse the command line arguments and return the parsed arguments.
@@ -41,11 +43,12 @@ namespace GameOfLife::CLI {
             return {};
         }
         file.close();
+        auto ext = File::Utils::getExtension(inputFile);
 
         // Default values
         int generations = 1000;
         int delay = 100;
-        bool highPerformance = false;
+        bool highPerformance = ext == ".rle" || ext == ".cells";
         bool endIfStatic = false;
         bool interactive = false;
         bool warp = false;
@@ -89,9 +92,10 @@ namespace GameOfLife::CLI {
             }
 
             // Boolean arguments
-            if (arg == "-p" || arg == "--high-performance") {
+            // It is now irrelevant to ask for high performance mode
+            /*if (arg == "-p" || arg == "--high-performance") {
                 highPerformance = true;
-            }
+            }*/
             if (arg == "-s" || arg == "--end-if-static") {
                 endIfStatic = true;
             }
@@ -149,6 +153,80 @@ namespace GameOfLife::CLI {
             warp, dynamic, verbose, GUI, aliveChar, deadChar, separator};
     }
 
+    Arguments Arguments::interactiveParse() {
+        std::cout << "Interactive mode (Ctrl+C to exit)\n" << std::endl;
+
+        std::string filePath;
+        std::cout << "Enter the path to the file: ";
+        std::cin >> filePath;
+        File::Utils::makeAbsolutePath(filePath);
+        // Check if the input file exists
+        std::ifstream file(filePath);
+        if (!file.good()) {
+            std::cerr << "Input file does not exist: " << filePath << std::endl;
+            return {};
+        }
+        file.close();
+        auto ext = File::Utils::getExtension(filePath);
+        bool highPerformance = ext == ".rle" || ext == ".cells";
+
+        std::string outputFolder;
+        std::cout << "Enter the path to the output folder: ";
+        std::cin >> outputFolder;
+
+        int maxGenerations;
+        std::cout << "Enter the number of generations: ";
+        std::cin >> maxGenerations;
+
+        int delay;
+        std::cout << "Enter the delay between generations (ms): ";
+        std::cin >> delay;
+
+        // It is now irrelevant to ask for high performance mode
+        // std::cout << "Use high performance mode? (y/n): ";
+        // std::string highPerformanceStr;
+        // std::cin >> highPerformanceStr;
+        // bool highPerformance = highPerformanceStr == "y";
+
+        std::cout << "End if static? (y/n): ";
+        std::string endIfStaticStr;
+        std::cin >> endIfStaticStr;
+        bool endIfStatic = endIfStaticStr == "y";
+
+        std::cout << "Wrap mode (toroidal grid)? (y/n): ";
+        std::string warpStr;
+        std::cin >> warpStr;
+        bool warp = warpStr == "y";
+
+        std::cout << "Dynamic grid size (will disable wrap)? (y/n): ";
+        std::string dynamicStr;
+        std::cin >> dynamicStr;
+        bool dynamic = dynamicStr == "y";
+        warp = !dynamic && warp;
+
+        std::cout << "Verbose mode? (y/n): ";
+        std::string verboseStr;
+        std::cin >> verboseStr;
+        bool verbose = verboseStr == "y";
+
+        std::cout << "Alive char (for parsing, leave empty if using .cells or .rle): ";
+        char aliveChar;
+        std::cin >> aliveChar;
+
+        std::cout << "Dead char (for parsing, leave empty if using .cells or .rle): ";
+        char deadChar;
+        std::cin >> deadChar;
+
+        std::cout << "Separator (for parsing, leave empty if using .cells or .rle): ";
+        char separator;
+        std::cin >> separator;
+
+        Arguments interactiveArguments(filePath, outputFolder, maxGenerations, delay, highPerformance,
+            endIfStatic, true, warp, verbose, deadChar, separator);
+
+        return interactiveArguments;
+    }
+
     /**
      * Print the help message, displaying the usage and options.
      */
@@ -158,7 +236,7 @@ namespace GameOfLife::CLI {
         std::cout << "  -h, --help\t\t\tPrint this help message\n";
         std::cout << "  -g, --generations <n>\t\tNumber of generations to simulate (default: 1000)\n";
         std::cout << "  -x, --delay <ms>\t\tDelay between generations in milliseconds (default: 100)\n";
-        std::cout << "  -p, --high-performance\tUse high performance mode\n";
+        // std::cout << "  -p, --high-performance\tUse high performance mode\n";
         std::cout << "  -s, --end-if-static\t\tEnd simulation if the grid is static or does not evolve\n";
         std::cout << "  -w, --wrap\t\t\tWarp around the grid (toroidal grid)\n";
         std::cout << "  -y, --dynamic\t\t\tDynamic grid size (takes priority on wrap)\n";

@@ -39,6 +39,7 @@ namespace GameOfLife::CLI {
                 aliveChar(aliveChar), deadChar(deadChar), separator(separator), valid(true) {}
 
         static Arguments parse(int argc, char *argv[]);
+        static Arguments interactiveParse();
         static void printHelp();
 
         std::string getInputFile() { return inputFile; }

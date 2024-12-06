@@ -20,7 +20,7 @@ namespace GameOfLife::CLI {
      * @param defaultsToInteractive If true, the application will force interactive mode.
      * @return The exit code.
      */
-    int Main::start(Arguments arguments, bool defaultsToInteractive) {
+    int Main::start(Arguments arguments, const bool defaultsToInteractive) {
         // Check if the arguments are correctly parsed
         if (!arguments.isValid()) {
             return 1;
@@ -31,66 +31,8 @@ namespace GameOfLife::CLI {
 
         // Interactive mode (manual input)
         if (arguments.isInteractive() || defaultsToInteractive) {
+            auto interactiveArguments = Arguments::interactiveParse();
 
-            std::cout << "Interactive mode (Ctrl+C to exit)\n" << std::endl;
-
-            std::string filePath;
-            std::cout << "Enter the path to the file: ";
-            std::cin >> filePath;
-            // Check if the input file exists
-            std::ifstream file(filePath);
-            if (!file.good()) {
-                std::cerr << "Input file does not exist: " << filePath << std::endl;
-                return {};
-            }
-            file.close();
-
-            std::string outputFolder;
-            std::cout << "Enter the path to the output folder: ";
-            std::cin >> outputFolder;
-
-            int maxGenerations;
-            std::cout << "Enter the number of generations: ";
-            std::cin >> maxGenerations;
-
-            int delay;
-            std::cout << "Enter the delay between generations (ms): ";
-            std::cin >> delay;
-
-            std::cout << "Use high performance mode? (y/n): ";
-            std::string highPerformanceStr;
-            std::cin >> highPerformanceStr;
-            bool highPerformance = highPerformanceStr == "y";
-
-            std::cout << "End if static? (y/n): ";
-            std::string endIfStaticStr;
-            std::cin >> endIfStaticStr;
-            bool endIfStatic = endIfStaticStr == "y";
-
-            std::cout << "Warp mode (toroidal grid)? (y/n): ";
-            std::string warpStr;
-            std::cin >> warpStr;
-            bool warp = warpStr == "y";
-
-            std::cout << "Verbose mode? (y/n): ";
-            std::string verboseStr;
-            std::cin >> verboseStr;
-            bool verbose = verboseStr == "y";
-
-            std::cout << "Alive char (for parsing, leave empty is using .cells or .rle): ";
-            char aliveChar;
-            std::cin >> aliveChar;
-
-            std::cout << "Dead char (for parsing, leave empty is using .cells or .rle): ";
-            char deadChar;
-            std::cin >> deadChar;
-
-            std::cout << "Separator (for parsing, leave empty is using .cells or .rle): ";
-            char separator;
-            std::cin >> separator;
-
-            Arguments interactiveArguments(filePath, outputFolder, maxGenerations, delay, highPerformance,
-                endIfStatic, true, warp, verbose, deadChar, separator);
             interactiveArguments.isHighPerformance() ? fastWorkWrapper(interactiveArguments) : workWrapper(interactiveArguments);
             return 0;
         }
