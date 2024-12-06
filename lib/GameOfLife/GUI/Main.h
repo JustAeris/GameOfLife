@@ -15,6 +15,7 @@ namespace GameOfLife::GUI {
         bool dynamic = true;
         CLI::Arguments args;
 
+        void drawGrid(sf::RenderWindow &window, Game::Grid &grid, bool drawBorder = false);
         void drawHelp(sf::RenderWindow &window, sf::Font &font) const;
         void drawVerbose(sf::RenderWindow &window, const sf::Font &font, const Game::Grid &grid,
             long long drawTime, long long stepTime, int generation, int delay);
@@ -23,7 +24,6 @@ namespace GameOfLife::GUI {
         explicit Main(CLI::Arguments args) : delay(args.getDelay()), verbose(args.isVerbose()), warp(args.doWarp()),
             dynamic(true), args(std::move(args)) {}
         void start();
-        void drawGrid(sf::RenderWindow &window, Game::Grid &grid, bool drawBorder = false);
     };
 
 }
