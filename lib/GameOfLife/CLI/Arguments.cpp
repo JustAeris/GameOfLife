@@ -17,13 +17,18 @@ namespace GameOfLife::CLI {
     Arguments Arguments::parse(int argc, char *argv[]) {
         // Check for interactive mode
         if (argc == 1 || (argc == 2 && (strcmp(argv[1], "-i") == 0 || strcmp(argv[1], "--interactive") == 0))) {
-            return {"", "", 1000, 100, false, true, true, false, false, false, false, '1', '0', ' '};
+            return {"", "", 1000, 100, false, true, true, false, false, false, false, false, '1', '0', ' '};
         }
 
         // Check for help
         if (argc == 2 && (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0)) {
             printHelp();
             return {};
+        }
+
+        // Check for unit tests
+        if (argc == 2 && (strcmp(argv[1], "-t") == 0 || strcmp(argv[1], "--unit-tests") == 0)) {
+            return {"", "", 1000, 100, false, true, false, false, false, false, false, true, '1', '0', ' '};
         }
 
         // Check for the minimum number of arguments
@@ -150,7 +155,7 @@ namespace GameOfLife::CLI {
 
         // Return the parsed arguments
         return {inputFile, outputFolder, generations, delay, highPerformance, endIfStatic, interactive,
-            warp, dynamic, verbose, GUI, aliveChar, deadChar, separator};
+            warp, dynamic, verbose, GUI, false, aliveChar, deadChar, separator};
     }
 
     Arguments Arguments::interactiveParse() {
@@ -246,5 +251,6 @@ namespace GameOfLife::CLI {
         std::cout << "  -e, --separator <c>\t\tCharacter to separate cells (default: space, unused if file is .cells or .rle)\n";
         std::cout << "  -i, --interactive\t\tInteractive mode (overwrites other options)\n";
         std::cout << "  -u, --user-interface\t\t\tStart the GUI (some options will carry over)\n";
+        std::cout << "  -t, --unit-tests\t\tRun the unit tests\n";
     }
 }
