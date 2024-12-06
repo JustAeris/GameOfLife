@@ -69,7 +69,7 @@ namespace GameOfLife::GUI {
         sf::RenderWindow window(sf::VideoMode(desktop.width * 0.9, desktop.height * 0.8), "Game Of Life", sf::Style::Close);
 
         sf::Font font;
-        if (!font.loadFromFile(R"(C:\Users\matth\CLionProjects\GameOfLife-GroupA\cmake-build-debug\Ubuntu-Regular.ttf)")) {
+        if (!font.loadFromFile(File::Utils::makeAbsolutePath("Ubuntu-Regular.ttf").string())) {
             std::cerr << "Error loading font" << std::endl;
         }
 
