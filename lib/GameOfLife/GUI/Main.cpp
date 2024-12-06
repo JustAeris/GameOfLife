@@ -173,9 +173,7 @@ namespace GameOfLife::GUI {
                         // Parse glider.rle and insert it into the grid where the mouse is
                         auto mousePos = sf::Mouse::getPosition(window);
                         auto [gridRow, gridCols] = mousePosToGridPos(window, grid, mousePos.x, mousePos.y);
-                        if (gridRow < grid.getRows() && gridCols < grid.getCols() && gridRow >= 0 && gridCols >= 0) {
-                            insertPattern(grid, File::Utils::makeAbsolutePath("/Patterns/glider.rle"), gridRow, gridCols);
-                        }
+                        insertPattern(grid, File::Utils::makeAbsolutePath("Patterns/glider.rle").string(), gridRow, gridCols);
                     }
                 }
             }
@@ -273,16 +271,30 @@ namespace GameOfLife::GUI {
     }
 
     void Main::insertPattern(Game::Grid &grid, const std::string &pattern, int row, int col) {
+        if (row > grid.getRows() && col > grid.getCols() && row < 0 && col < 0)
+            return;
+
         int rows = 0;
         int cols = 0;
         const std::vector<std::vector<bool>> cells = File::Parser::parseRLE(pattern, rows, cols);
+
+        if (row < 0 || col < 0 || row + rows > grid.getRows() || col + cols > grid.getCols())
+            return;
+
         grid.insert(cells, row, col, false);
     }
 
     void Main::insertPattern(Game::ExtendedGrid &grid, const std::string &pattern, int row, int col) {
+        if (row > grid.getRows() && col > grid.getCols() && row < 0 && col < 0)
+            return;
+
         int rows = 0;
         int cols = 0;
         const std::vector<std::vector<bool>> cells = File::Parser::parseRLE(pattern, rows, cols);
+
+        if (row < 0 || col < 0 || row + rows > grid.getRows() || col + cols > grid.getCols())
+            return;
+
         auto cellObjects = std::vector(rows, std::vector(cols, Game::Cell(false, false)));
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
