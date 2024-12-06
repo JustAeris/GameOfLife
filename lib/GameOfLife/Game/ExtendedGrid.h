@@ -25,7 +25,7 @@ namespace GameOfLife::Game {
         int maxRows;
         int maxCols;
 
-        int multiThreadedThreshold = 1000;
+        int multiThreadedThreshold = 100000;
         bool isDynamic;
 
         File::FormatConfig formatConfig = File::FormatConfig('X', '.', '\0');

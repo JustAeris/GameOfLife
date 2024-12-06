@@ -102,8 +102,8 @@ namespace GameOfLife::Game {
         }
 
         if (livingCells.size() > multiThreadedThreshold) {
-            // multiThreadedStep(wrap);
-            // return;
+            multiThreadedStep(wrap);
+            return;
         }
 
         const std::pair<int, int> directions[] = {
@@ -170,7 +170,6 @@ namespace GameOfLife::Game {
 
     void Grid::multiThreadedStep(const bool wrap) {
         // Assume that the size check has already been done
-        // TODO: Add mutexes to prevent concurrent access to the living cells set
 
         // Directions to check
         const std::pair<int, int> directions[] = {
@@ -181,6 +180,7 @@ namespace GameOfLife::Game {
 
         auto cellsToCheck = std::unordered_set<std::pair<int, int>, HashFunction>();
         std::mutex cellsToCheckMutex;
+        std::mutex nextMutex;
 
         // Function to process a chunk of living cells
         auto checkCells = [&](const int start, const int end) {
@@ -224,6 +224,8 @@ namespace GameOfLife::Game {
                 const int col = cell.second;
 
                 const int neighbors = countNeighbors(row, col, wrap);
+
+                std::lock_guard nextLock(nextMutex);
 
                 if (cells[row][col]) {
                     if (neighbors < 2 || neighbors > 3) {
