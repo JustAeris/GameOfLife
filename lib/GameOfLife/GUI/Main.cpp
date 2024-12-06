@@ -72,7 +72,7 @@ namespace GameOfLife::GUI {
         // Create the window
         sf::RenderWindow window(sf::VideoMode(desktop.width * 0.9, desktop.height * 0.8), "Game Of Life", sf::Style::Close);
 
-        Game::Grid grid(cells, rows, cols, window.getSize().y - 1, window.getSize().x - 1);
+        Game::Grid grid(cells, rows, cols, window.getSize().y - 1, window.getSize().x - 1, args.isDynamic());
 
         sf::RenderTexture renderTexture;
         renderTexture.create(window.getSize().x, window.getSize().y);
@@ -83,6 +83,7 @@ namespace GameOfLife::GUI {
         }
 
         int generation = 0;
+        auto previous = std::chrono::system_clock::now();
 
         while (window.isOpen()) {
             sf::Event event{};
@@ -142,7 +143,8 @@ namespace GameOfLife::GUI {
             }
 
             auto now = std::chrono::system_clock::now();
-            if (run) {
+            auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - previous).count();
+            if (run && elapsed >= delay) {
                 // Step and draw the grid
                 grid.step(warp, dynamic);
                 auto stepTime = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - now).count();
@@ -155,10 +157,8 @@ namespace GameOfLife::GUI {
                 }
 
                 window.display();
+                previous = std::chrono::system_clock::now();
             }
-
-            // Sleep
-            sleep(sf::milliseconds(delay));
         }
     }
 
