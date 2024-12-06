@@ -6,6 +6,7 @@
 #include <SFML/Window.hpp>
 #include <SFML/System.hpp>
 
+#include "File/ExtendedParser.h"
 #include "File/Parser.h"
 #include "File/Utils.h"
 #include "Game/Grid.h"
@@ -33,7 +34,8 @@ namespace GameOfLife::GUI {
         window.draw(text);
     }
 
-    void Main::drawVerbose(sf::RenderWindow &window, const sf::Font &font, const Game::Grid &grid, const long long drawTime,
+    template<typename TGrid>
+    void Main::drawVerbose(sf::RenderWindow &window, const sf::Font &font, const TGrid &grid, const long long drawTime,
         const long long stepTime, const int generation, const int delay) {
         // Print text the frames per second and generation time
         sf::Text text;
@@ -60,28 +62,60 @@ namespace GameOfLife::GUI {
         if (!args.isValid())
             return;
 
-        // Initialize the grid
-        File::Parser parser(File::FormatConfig('O', '.', '\0'));
-        int rows = 0;
-        int cols = 0;
-        auto cells = parser.parse(args.getInputFile(), rows, cols);
-
         // Get the screen resolution
         sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
 
         // Create the window
         sf::RenderWindow window(sf::VideoMode(desktop.width * 0.9, desktop.height * 0.8), "Game Of Life", sf::Style::Close);
 
-        Game::Grid grid(cells, rows, cols, window.getSize().y - 1, window.getSize().x - 1, args.isDynamic());
-
-        sf::RenderTexture renderTexture;
-        renderTexture.create(window.getSize().x, window.getSize().y);
-
         sf::Font font;
         if (!font.loadFromFile(R"(C:\Users\matth\CLionProjects\GameOfLife-GroupA\cmake-build-debug\Ubuntu-Regular.ttf)")) {
             std::cerr << "Error loading font" << std::endl;
         }
 
+        if (args.isHighPerformance()) {
+            File::OutputFormat outputFormat;
+            const auto formatConfig = File::FormatConfig('O', '.', '\0');
+
+            // Parse the input file and define the output format
+            int rows = 0;
+            int cols = 0;
+            std::vector<std::vector<bool>> cells;
+            if (args.getInputFile().ends_with(".rle")) {
+                cells = File::Parser::parseRLE(args.getInputFile(), rows, cols);
+                outputFormat = File::OutputFormat::RLE;
+            }
+            else if (args.getInputFile().ends_with(".cells")) {
+                cells = File::Parser(formatConfig).parse(args.getInputFile(), rows, cols);
+                outputFormat = File::OutputFormat::PLAINTEXT;
+            }
+            else {
+                std::cerr << "Fast mode only supports .rle and .cells files" << std::endl;
+                return;
+            }
+
+            // Create the grid
+            Game::Grid grid(cells, rows, cols, window.getSize().y - 2, window.getSize().x - 2, args.isDynamic());
+            grid.setFormatConfig(formatConfig);
+
+            render(window, grid, font);
+            return;
+        }
+
+        // Parse the input file and define the output format
+        int rows = 0;
+        int cols = 0;
+        const File::FormatConfig formatConfig(args.getAliveChar(), args.getDeadChar(), args.getSeparator());
+        const std::vector<std::vector<Game::Cell>> cells = File::ExtendedParser(formatConfig).parse(args.getInputFile(), rows, cols);
+
+        Game::ExtendedGrid grid(cells, rows, cols, window.getSize().y - 2, window.getSize().x - 2, args.isDynamic());
+        grid.setFormatConfig(formatConfig);
+
+        render(window, grid, font);
+    }
+
+    template<typename TGrid>
+    void Main::render(sf::RenderWindow &window, TGrid &grid, sf::Font &font) {
         int generation = 0;
         auto previous = std::chrono::system_clock::now();
 
@@ -162,13 +196,11 @@ namespace GameOfLife::GUI {
         }
     }
 
-    void Main::drawGrid(sf::RenderWindow &window, Game::Grid &grid, bool drawBorder) {
-        // Calculate the cell size based on the window size and grid dimensions
-        int cellSize = std::min(window.getSize().x / grid.getCols(), window.getSize().y / grid.getRows());
-        cellSize = std::max(cellSize, 1);
-        // Calculate the offset to center the grid
-        float offsetX = (window.getSize().x - (grid.getCols() * cellSize)) / 2.0f;
-        float offsetY = (window.getSize().y - (grid.getRows() * cellSize)) / 2.0f;
+
+    void Main::drawGrid(sf::RenderWindow &window, Game::Grid &grid) {
+        int cellSize;
+        float offsetX, offsetY;
+        getDimensions(window, grid, cellSize, offsetX, offsetY);
 
         // Get the cells that changed state
         auto changedCells = grid.getChangedCells();
@@ -183,15 +215,38 @@ namespace GameOfLife::GUI {
             window.draw(rectangle);
         }
 
-        if (!drawBorder)
-            return;
+    }
 
-        // Draw a border
-        sf::RectangleShape border(sf::Vector2f(grid.getCols() * cellSize, grid.getRows() * cellSize));
-        border.setPosition(offsetX, offsetY);
-        border.setFillColor(sf::Color::Transparent);
-        border.setOutlineThickness(1);
-        border.setOutlineColor(sf::Color::White);
-        window.draw(border);
+    void Main::drawGrid(sf::RenderWindow &window, const Game::ExtendedGrid &grid) {
+        int cellSize;
+        float offsetX, offsetY;
+        getDimensions<Game::ExtendedGrid>(window, grid, cellSize, offsetX, offsetY);
+
+        for (int i = 0; i < grid.getRows(); i++) {
+            for (int j = 0; j < grid.getCols(); j++) {
+                if (grid.isObstacle(i, j)) {
+                    // Draw the obstacle
+                    sf::RectangleShape rectangle(sf::Vector2f(cellSize, cellSize));
+                    rectangle.setPosition(j * cellSize + offsetX, i * cellSize + offsetY);
+                    rectangle.setFillColor(grid.isAlive(i, j) ? sf::Color::Blue : sf::Color::Red);
+                    window.draw(rectangle);
+                    continue;
+                }
+                sf::RectangleShape rectangle(sf::Vector2f(cellSize, cellSize));
+                rectangle.setPosition(j * cellSize + offsetX, i * cellSize + offsetY);
+                rectangle.setFillColor(grid.isAlive(i, j) ? sf::Color::White : sf::Color::Black);
+                window.draw(rectangle);
+            }
+        }
+    }
+
+    template<typename TGrid>
+    void Main::getDimensions(sf::RenderWindow &window, const TGrid &grid, int &cellSize, float &offsetX, float &offsetY) const {
+        // Calculate the cell size based on the window size and grid dimensions
+        cellSize = std::min(window.getSize().x / grid.getCols(), window.getSize().y / grid.getRows());
+        cellSize = std::max(cellSize, 1);
+        // Calculate the offset to center the grid
+        offsetX = (window.getSize().x - (grid.getCols() * cellSize)) / 2.0f;
+        offsetY = (window.getSize().y - (grid.getRows() * cellSize)) / 2.0f;
     }
 }
