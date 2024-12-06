@@ -32,7 +32,9 @@ target_link_libraries(GameOfLife PRIVATE sfml-graphics sfml-system sfml-window)
 
 # Define DEBUG macro for debug builds
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
-
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc -static-libstdc++ -static")
 
 
+# Copy the patterns folder to the build directory
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Patterns)
+file(COPY ${CMAKE_SOURCE_DIR}/lib/Patterns DESTINATION ${CMAKE_BINARY_DIR})

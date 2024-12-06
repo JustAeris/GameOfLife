@@ -9,10 +9,9 @@
 #include "File/Writer.h"
 #include "Game/ExtendedGrid.h"
 #include "Game/Grid.h"
-#include "Game/HighPerformanceGrid.h"
 #include "GUI/Main.h"
 
-
+/*
 void runTest(GameOfLife::Game::ExtendedGrid &grid, int iterations) {
     grid.randomize();
     for (int i = 0; i < iterations; i++) {
@@ -110,7 +109,7 @@ void benchmarkGridSize(int rows, int cols) {
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> duration = end - start;
     std::cout << "Grid size: " << rows << "x" << cols << ", Time: " << duration.count() << " seconds "
-              <</* (useMultithreading ? "Multithreaded" : "Sequential") <<*/ std::endl;
+              <</* (useMultithreading ? "Multithreaded" : "Sequential") << std::endl;
 }
 
 void sizeTest() {
@@ -172,7 +171,7 @@ void writerTest() {
 
     GameOfLife::File::Writer::writeRLE(grid, "test.rle");
 }
-
+*/
 int main(int argc, char *argv[]) {
     auto args = GameOfLife::CLI::Arguments::parse(argc, argv);
 
