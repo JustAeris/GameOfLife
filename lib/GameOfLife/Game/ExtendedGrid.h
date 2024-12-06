@@ -28,7 +28,7 @@ namespace GameOfLife::Game {
         int multiThreadedThreshold = 100000;
         bool isDynamic;
 
-        File::FormatConfig formatConfig = File::FormatConfig('X', '.', '\0');
+        File::FormatConfig formatConfig = File::FormatConfig('1', '0', ' ');
         char livingObstacle = 'x';
         char deadObstacle = 'o';
 
