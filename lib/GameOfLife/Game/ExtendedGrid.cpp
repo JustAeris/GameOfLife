@@ -50,6 +50,10 @@ namespace GameOfLife::Game {
         return cells[row][col].isAlive();
     }
 
+    bool ExtendedGrid::isObstacle(int row, int col) const {
+        return cells[row][col].isObstacle();
+    }
+
     int ExtendedGrid::countNeighbors(const int row, const int col, const bool wrap) const {
         int count = 0;
 
@@ -127,7 +131,8 @@ namespace GameOfLife::Game {
 
             const int neighbors = countNeighbors(row, col, wrap);
 
-            setAliveNext(row, col, cells[row][col].willBeAlive(neighbors));
+            if (!isObstacle(row, col))
+                setAliveNext(row, col, cells[row][col].willBeAlive(neighbors));
         }
 
         // Move the next generation to the current generation

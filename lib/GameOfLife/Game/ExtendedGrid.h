@@ -43,6 +43,7 @@ namespace GameOfLife::Game {
 
         void setAlive(int row, int col, bool alive) override;
         [[nodiscard]] bool isAlive(int row, int col) const override;
+        [[nodiscard]] bool isObstacle(int row, int col) const;
         [[nodiscard]] int countNeighbors(int row, int col, bool wrap) const override;
 
         void step() override;
