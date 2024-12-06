@@ -302,9 +302,8 @@ namespace GameOfLife::Game {
 
     void Grid::clear() {
         // Clear the living cells
-        for (auto &cell : livingCells) {
-            setAlive(cell.first, cell.second, false);
-            changedCells.insert(cell);
+        for (auto &row : cells) {
+            std::fill(row.begin(), row.end(), false);
         }
         livingCells.clear();
         next = cells;
