@@ -21,6 +21,8 @@ namespace GameOfLife::GUI {
 
         void drawGrid(sf::RenderWindow &window, Game::Grid &grid);
         void drawGrid(sf::RenderWindow &window, const Game::ExtendedGrid &grid);
+        void insertPattern(Game::Grid &grid, const std::string &pattern, int row, int col);
+        void insertPattern(Game::ExtendedGrid &grid, const std::string &pattern, int row, int col);
         void drawHelp(sf::RenderWindow &window, sf::Font &font) const;
         template<typename TGrid>
         void drawVerbose(sf::RenderWindow &window, const sf::Font &font, const TGrid &grid,
@@ -28,6 +30,9 @@ namespace GameOfLife::GUI {
 
         template<typename TGrid>
         void render(sf::RenderWindow &window, TGrid &grid, sf::Font &font);
+
+        template<typename TGrid>
+        std::pair<int, int> mousePosToGridPos(sf::RenderWindow &window, const TGrid &grid, int mouseX, int mouseY);
     public:
         Main() = delete;
         explicit Main(CLI::Arguments args) : delay(args.getDelay()), verbose(args.isVerbose()), warp(args.doWarp()),

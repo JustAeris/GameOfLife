@@ -137,6 +137,7 @@ namespace GameOfLife::GUI {
 
                     if (event.key.code == sf::Keyboard::S && !run) {
                         grid.step();
+                        generation++;
                         drawGrid(window, grid);
                         window.display();
                     }
@@ -167,6 +168,15 @@ namespace GameOfLife::GUI {
                         if (dynamic && warp)
                             warp = false;
                     }
+
+                    if (event.key.code == sf::Keyboard::G) {
+                        // Parse glider.rle and insert it into the grid where the mouse is
+                        auto mousePos = sf::Mouse::getPosition(window);
+                        auto [gridRow, gridCols] = mousePosToGridPos(window, grid, mousePos.x, mousePos.y);
+                        if (gridRow < grid.getRows() && gridCols < grid.getCols() && gridRow >= 0 && gridCols >= 0) {
+                            insertPattern(grid, File::Utils::makeAbsolutePath("/Patterns/glider.rle"), gridRow, gridCols);
+                        }
+                    }
                 }
             }
 
@@ -194,6 +204,18 @@ namespace GameOfLife::GUI {
                 previous = std::chrono::system_clock::now();
             }
         }
+    }
+
+    template<typename TGrid>
+    std::pair<int, int> Main::mousePosToGridPos(sf::RenderWindow &window, const TGrid &grid, int mouseX, int mouseY) {
+        int cellSize;
+        float offsetX, offsetY;
+        getDimensions(window, grid, cellSize, offsetX, offsetY);
+
+        int gridX = static_cast<int>((mouseX - offsetX) / cellSize);
+        int gridY = static_cast<int>((mouseY - offsetY) / cellSize);
+
+        return {gridY, gridX};
     }
 
 
@@ -248,5 +270,25 @@ namespace GameOfLife::GUI {
         // Calculate the offset to center the grid
         offsetX = (window.getSize().x - (grid.getCols() * cellSize)) / 2.0f;
         offsetY = (window.getSize().y - (grid.getRows() * cellSize)) / 2.0f;
+    }
+
+    void Main::insertPattern(Game::Grid &grid, const std::string &pattern, int row, int col) {
+        int rows = 0;
+        int cols = 0;
+        const std::vector<std::vector<bool>> cells = File::Parser::parseRLE(pattern, rows, cols);
+        grid.insert(cells, row, col, false);
+    }
+
+    void Main::insertPattern(Game::ExtendedGrid &grid, const std::string &pattern, int row, int col) {
+        int rows = 0;
+        int cols = 0;
+        const std::vector<std::vector<bool>> cells = File::Parser::parseRLE(pattern, rows, cols);
+        auto cellObjects = std::vector(rows, std::vector(cols, Game::Cell(false, false)));
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                cellObjects[i][j] = Game::Cell(cells[i][j], false);
+            }
+        }
+        grid.insert(cellObjects, row, col, false);
     }
 }
