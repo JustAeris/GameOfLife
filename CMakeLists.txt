@@ -34,6 +34,10 @@ target_link_libraries(GameOfLife PRIVATE sfml-graphics sfml-system sfml-window)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc -static-libstdc++ -static")
 
+# Copy the SFML DLLs to the build directory
+file(COPY ${SFML_DIR}/bin/sfml-graphics-2.dll DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY ${SFML_DIR}/bin/sfml-system-2.dll DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY ${SFML_DIR}/bin/sfml-window-2.dll DESTINATION ${CMAKE_BINARY_DIR})
 
 # Copy the patterns folder to the build directory
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Patterns)
