@@ -56,7 +56,7 @@ namespace GameOfLife::CLI {
         const std::vector<std::vector<Game::Cell>> cells = File::ExtendedParser(formatConfig).parse(args.getInputFile(), rows, cols);
 
         // Create the grid
-        Game::ExtendedGrid grid(cells, rows, cols);
+        Game::ExtendedGrid grid(cells, rows, cols, DEFAULT_MAX_ROWS, DEFAULT_MAX_COLS, args.isDynamic());
         grid.setFormatConfig(formatConfig);
 
         // Create the array for static grid detection
@@ -89,7 +89,7 @@ namespace GameOfLife::CLI {
         }
 
         // Create the grid
-        Game::Grid grid(cells, rows, cols);
+        Game::Grid grid(cells, rows, cols, DEFAULT_MAX_ROWS, DEFAULT_MAX_COLS, args.isDynamic());
         grid.setFormatConfig(formatConfig);
 
         // Create the array for static grid detection
