@@ -12,6 +12,46 @@
 
 
 namespace GameOfLife::GUI {
+    void Main::drawHelp(sf::RenderWindow &window, sf::Font &font) const {
+        sf::Text text;
+        text.setFont(font);
+        auto ss = std::stringstream();
+        ss << "Space - Start/Stop\n"
+           << "R - Randomize\n"
+           << "C - Clear\n"
+           << "S - Step\n"
+           << "Up/Down - Speed\n"
+           << "Escape - Exit\n"
+           << "V - Verbose " << (verbose ? "(On)" : "(Off)")
+           << "\nW - Wrap " << (warp ? "(On)" : "(Off)")
+           << "\nD - Dynamic " << (dynamic ? "(On)" : "(Off)");
+        text.setString(ss.str());
+        text.setCharacterSize(24);
+        text.setFillColor(sf::Color::White);
+        text.setPosition(10, 10);
+
+        window.draw(text);
+    }
+
+    void Main::drawVerbose(sf::RenderWindow &window, const sf::Font &font, const Game::Grid &grid, const long long drawTime,
+        const long long stepTime, const int generation, const int delay) {
+        // Print text the frames per second and generation time
+        sf::Text text;
+        text.setFont(font);
+        text.setString("FPS: " + std::to_string(drawTime == 0 ? -1 : 1000000 / drawTime) +
+            " - Generation time: " + std::to_string(stepTime) + "us" +
+            "\nGrid size: " + std::to_string(grid.getRows()) + "x" + std::to_string(grid.getCols()) +
+            "\nLiving cells: " + std::to_string(grid.getLivingCells().size()) +
+            "\nDead cells: " + std::to_string(grid.getRows() * grid.getCols() - grid.getLivingCells().size()) +
+            "\nAlive ratio: " + std::to_string(grid.getLivingCells().size() * 100.0 / (grid.getRows() * grid.getCols())) + "%" +
+            "\nDelay: " + std::to_string(delay) + "ms" + " - Generation: " + std::to_string(generation));
+        text.setCharacterSize(24);
+        text.setFillColor(sf::Color::White);
+        text.setPosition(10, window.getSize().y - 180);
+
+        window.draw(text);
+    }
+
     /**
      * Start the GUI loop
      */
@@ -98,24 +138,7 @@ namespace GameOfLife::GUI {
             window.clear(sf::Color::Black);
 
             if (showHelp) {
-                sf::Text text;
-                text.setFont(font);
-                auto ss = std::stringstream();
-                ss << "Space - Start/Stop\n"
-                   << "R - Randomize\n"
-                   << "C - Clear\n"
-                   << "S - Step\n"
-                   << "Up/Down - Speed\n"
-                   << "Escape - Exit\n"
-                   << "V - Verbose " << (verbose ? "(On)" : "(Off)")
-                   << "\nW - Wrap " << (warp ? "(On)" : "(Off)")
-                   << "\nD - Dynamic " << (dynamic ? "(On)" : "(Off)");
-                text.setString(ss.str());
-                text.setCharacterSize(24);
-                text.setFillColor(sf::Color::White);
-                text.setPosition(10, 10);
-
-                window.draw(text);
+                drawHelp(window, font);
             }
 
             auto now = std::chrono::system_clock::now();
@@ -128,21 +151,7 @@ namespace GameOfLife::GUI {
                 auto drawTime = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - now).count();
 
                 if (verbose) {
-                    // Print text the frames per second and generation time
-                    sf::Text text;
-                    text.setFont(font);
-                    text.setString("FPS: " + std::to_string(drawTime == 0 ? -1 : 1000000 / drawTime) +
-                        " - Generation time: " + std::to_string(stepTime) + "us" +
-                        "\nGrid size: " + std::to_string(grid.getRows()) + "x" + std::to_string(grid.getCols()) +
-                        "\nLiving cells: " + std::to_string(grid.getLivingCells().size()) +
-                        "\nDead cells: " + std::to_string(grid.getRows() * grid.getCols() - grid.getLivingCells().size()) +
-                        "\nAlive ratio: " + std::to_string(grid.getLivingCells().size() * 100.0 / (grid.getRows() * grid.getCols())) + "%" +
-                        "\nDelay: " + std::to_string(delay) + "ms" + " - Generation: " + std::to_string(generation));
-                    text.setCharacterSize(24);
-                    text.setFillColor(sf::Color::White);
-                    text.setPosition(10, window.getSize().y - 180);
-
-                    window.draw(text);
+                    drawVerbose(window, font, grid, drawTime, stepTime, generation, delay);
                 }
 
                 window.display();
