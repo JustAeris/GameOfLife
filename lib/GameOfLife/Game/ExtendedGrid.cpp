@@ -118,8 +118,11 @@ namespace GameOfLife::Game {
                 const int newRow = row + direction.first;
                 const int newCol = col + direction.second;
 
-                if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols) {
-                    cellsToCheck.insert(std::make_pair(newRow, newCol));
+                int wrappedRow = wrap ? (newRow + rows) % rows : newRow;
+                int wrappedCol = wrap ? (newCol + cols) % cols : newCol;
+
+                if (wrappedRow >= 0 && wrappedRow < rows && wrappedCol >= 0 && wrappedCol < cols) {
+                    cellsToCheck.insert(std::make_pair(wrappedRow, wrappedCol));
                 }
             }
         }
@@ -177,9 +180,12 @@ namespace GameOfLife::Game {
                     const int newRow = row + direction.first;
                     const int newCol = col + direction.second;
 
-                    if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols) {
+                    int wrappedRow = wrap ? (newRow + rows) % rows : newRow;
+                    int wrappedCol = wrap ? (newCol + cols) % cols : newCol;
+
+                    if (wrappedRow >= 0 && wrappedRow < rows && wrappedCol >= 0 && wrappedCol < cols) {
                         std::lock_guard lock(cellsToCheckMutex);
-                        cellsToCheck.insert(std::make_pair(newRow, newCol));
+                        cellsToCheck.insert(std::make_pair(wrappedRow, wrappedCol));
                     }
                 }
             }
