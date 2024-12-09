@@ -1,0 +1,56 @@
+sequenceDiagram
+    participant Main as CLI:Main
+    participant Arguments as CLI:Arguments
+    participant Parser as File:Parser
+    participant ExtendedParser as File:ExtendedParser
+    participant Grid as Game:Grid
+    participant ExtendedGrid as Game:ExtendedGrid
+    participant Utils as File:Utils
+    participant Writer as File:Writer
+    participant GUIMain as GUI:Main
+
+    Main->>Arguments: parse(argc, argv)
+    Arguments-->>Main: Arguments object
+    
+    Main->>FormatConfig: create configuration
+    FormatConfig-->>Main: FormatConfig object
+    
+    alt Parser standard
+        Main->>Parser: create with FormatConfig
+        Parser->>Utils: getNoOfLines()
+        Parser->>Utils: getMaxLineLength()
+        Parser->>Parser: parse(inputFile, rows, cols)
+        Parser-->>Main: Grid of boolean
+        
+        Main->>Grid: create(cells, rows, cols)
+    end
+    
+    alt Extended Parser
+        Main->>ExtendedParser: create with FormatConfig
+        ExtendedParser->>Utils: getNoOfLines()
+        ExtendedParser->>Utils: getMaxLineLength()
+        ExtendedParser->>ExtendedParser: parse(inputFile, rows, cols)
+        ExtendedParser-->>Main: Grid of Cells
+        
+        Main->>ExtendedGrid: create(cells, rows, cols)
+    end
+    
+    alt GUI Mode
+        Main->>GUIMain: create(arguments)
+        GUIMain->>GUIMain: start()
+        
+        Note over GUIMain: Appelle les méthodes privées<br>- getDimensions()<br>- drawGrid()<br>- insertPattern()<br>- drawHelp()<br>- drawVerbose()<br>- render()<br>- mousePosToGridPos()
+        
+        GUIMain->>Grid: drawGrid()
+        GUIMain->>ExtendedGrid: drawGrid()
+    end
+    
+    alt File Output
+        Main->>Writer: write(grid, outputFile)
+        alt Multiple Generations
+            Main->>Writer: writeBulk(generations, outputFolder)
+        end
+    end
+    
+    Main->>Grid: step(wrap, dynamic)
+    Grid->>Grid: multiThreadedStep()

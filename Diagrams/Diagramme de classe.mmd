@@ -1,0 +1,273 @@
+classDiagram
+    %% Namespaces
+    namespace GameOfLife.CLI {
+        class Arguments {
+            - inputFile : string
+            - outputFolder : string
+            - generations : int
+            - delay : int
+            - highPerformance : bool
+            - endIfStatic : bool
+            - interactive : bool
+            - warp : bool
+            - dynamic : bool
+            - verbose : bool
+            - GUI : bool
+            - aliveChar : char
+            - deadChar : char
+            - separator : char
+            - valid : bool
+            + Arguments(inputFile : string, outputFolder : string, generations : int, delay : int, highPerformance : bool, endIfStatic : bool, interactive : bool, warp : bool, verbose : bool, aliveChar : char, deadChar : char, separator : char)
+            + static parse(argc : int, argv : char*[]) Arguments        
+            + static printHelp() 
+            + getInputFile() string
+            + getOutputFolder() string
+            + getGeneration() int
+            + getDelay() int
+            + isHighPerformance() bool
+            + doEndIfStatic() bool
+            + isInteractive() bool
+            + doWarp() bool
+            + isDynamic
+            + isVerbose() bool
+            + isGUI()
+            + isValid() bool
+            + getAliveChar() char
+            + getSeparator() char
+            + getDeadChar() char
+        }
+
+        class Main {
+            - static workWrapper(args : Arguments&) 
+            - static fastWorkWrapper(args : Arguments&) 
+            - static clearScreen() 
+            - template ~TGrid, T~ static simulate(grid : Tgrid&, args : Arguments&, canBeRLE : bool, bulk : vector~vector~vector~T~~&, outputFormat : OutputFormat)
+            + static start(argc : int, argv : char*[], clearScreen : bool) int
+            
+        }
+    }
+
+    namespace GameOfLife.File {
+        class BaseParser~T~{
+            + parse(filename : string&, rows : int&, cols : int&) T
+        }
+
+        class ExtendedParser{
+            - livingObstacle = '0' : char
+            - deadObstacle = 'x' : char
+            + ExtendedParser(config : FormatConfig)
+            + setFormatConfig(config : FormatConfig&)
+            + setLivingObstacle(livingObstacle : char)
+            + setDeadObstacle(deadObstacle : char)
+        }
+
+        class IWritable {
+            + getText() : string
+        }
+
+        class FormatConfig {
+            - delimiter : char
+            - alive : char
+            - dead : char
+            - comment : char
+            - extension : string
+            + FormatConfig(delimiter : char, alive : char, dead : char, comment : char, extension : string)
+            + getDelimiterChar() char
+            + getAliveChar() char
+            + getDeadChar() char
+            + getcommentChar() char
+            + getExtension() string
+        }
+
+        class OutputFormat {
+            CUSTOM
+            PLAINTEXT
+            RLE
+        }
+
+        class Writer {
+            static write(data : IWritable&, filename : string&)
+            static writeBulk(data : vector~IWritable~&, outputFolder : string&, startIndex : int)
+            static writeRLE(matrix : vector~vector~bool~~&, filemname : string)
+            static writeBulkRLE(matrix : vector~vector~bool~~&, outputFolder : string&, startIndex : int)
+        }
+
+        class Parser {
+            + Parser(config : FormatConfig&)
+            + setFormatConfig(config : Format&)
+            + static parseRLE(filename : string&, rows : int&, cols : int&) vector~vector~bool~~
+        }
+
+        class Utils {
+            + static getNoOfLines(filename : string&, comment = '!' : char) int
+            + static getMaxLineLength(filePath : string, comment = '!' : char, delimiter = ' ' : char) int
+            + static removeChar(str : string&, character : char)  string
+            + static makeAbsolutePath(path : filesystem::path&) filesystem::path
+            + static getExtension(filename : &string) string
+        }
+    }
+
+    namespace GameOfLife.Game {
+        class BaseCell {
+            - alive = false : bool
+            + BaseCell(alive : bool)
+            + isAlive() bool
+            + setAlive(alive : bool)
+            + willBeAlive(aliveNeighbours : int) bool
+            + print() void
+        }
+
+        class BaseGrid~TGrid, T~ {
+            + abstract setAlive(row : int , col : int, alive : bool)
+            + abstract isAlive(row : int, col : int) bool
+            + abstract countNeighbors(row : int, col : int, wrap : bool) int
+            + abstract step() 
+            + abstract step(wrap : bool)
+            + abstract randomize(aliveProbability : float) 
+            + abstract clear()
+            + abstract print() 
+            + abstract print(fromRow : int, fromCol : int, toRow : int, toCol : int)
+            + abstract getRows() int
+            + abstract getcols() int
+            + abstract getCells() TGrid
+            + abstract getText() string
+            + move(grid : vector~vector~T~~&, livingCells : unorder_set~int, int~, HashFunction&, changedCells : unorder_set~int, int~, HashFunction&, fromRow : int, fromCol : int, toRow : int, toCol : int)
+            + resize(grid : vector~vector~T~~&, next : vector~vector~T~~&, livingCells : unorder_set~int, int~, HashFunction&, addNorth : int, addEast : int, addSouth : int, addWest : int, rows : int&, cols : int&, maxRows: int, maxCols : int)
+            + insert(grid : vector~vector~T~~&, livingCells : unorder_set~int, int~, HashFunction&, changedCells : unorder_set~int, int~, HashFunction&, cells : vector~vector~T~~&, row : int, col : int, rows : int, cols : int, maxRows : int, maxCols : int, hollow : bool)
+        }
+
+        class Cell {
+            - alive : bool
+            - obstacle : bool
+            + Cell()
+            + Cell(alive : bool)
+            + Cell(alve : bool, obstacle : bool)
+            + isObstacle() : bool
+            + setObstacle(obstacle : bool)
+        }
+
+        class ExtendedGrid {
+            - livingCells : unorder_set~int, int~, HashFunction
+            - changedCells : unorder_set~int, int~, HashFunction
+            - cells : vector~vector~BaseCell~~
+            - next : vector~vector~BaseCell~~
+            - rows : int
+            - cols : int
+            - maxRows : int
+            - maxCols : int
+            - multiThreadedThreshold = 1000 : int
+            - isDynamic : bool
+            - livingObstacle = 'x': char 
+            - deadObstacle = 'o' : char
+            - setAliveNext(row : int, col : int, alive : bool)
+            - multiThreadedStop(wrap : bool)
+
+            + ExtendedGrid(rows : int, cols : int, maxRows = 1000 : int, maxCols = 1000 : int, isDynamic = true :  bool)
+            + ExtendedGrid(cells : vector~vector~Cell~~, rows : int, cols : int, maxRows = 1000 : int, maxCols = 1000 : int, isDynamic = true : bool)
+            + step(wrap : bool, dynamic = true : bool)
+            + move(fromRow : int, fromCol : int, numRows : int, numCols : int, toRow : int, toCol : int)
+            + resize(addNorth : int, addEast : int, addSouth : int, addWest : int)
+            + insert(cells : vector~vector~Cell~~, row : int, col : int, hollow : int)
+            +getMaxRows() int
+            +getMaxCols() int
+            +getLivingCells() unorder_set~int, int~, HashFunction&
+            +getChangedCells() unorder_set~int, int~, HashFunction&
+            +setFormatConfig(formatConfig: FormatConfig) void
+            +getFormatConfig() FormatConfig
+        }
+
+        class Grid {
+            - cells : vector~vector~bool~~
+            - next : vector~vector~bool~~
+            - livingCells : unorder_set~int, int~, HashFunction
+            - changedCells : unorder_set~int, int~, HashFunction
+            - rows : int
+            - cols : int
+            - maxRows : int
+            - maxCols : int
+            - multiThreadedThreshold = 1000 : bool
+            - isDynamic : bool
+            - setAliveNext(row : int, col : int, alive : bool)
+            - multiThreardedStep(wrap : bool)
+            + Grid(rows : int, cols : int, maxRow : int, maxCols : int, isDynamic = true : bool)
+            + Grid(cells : vector~vector~bool~~, rows : int, cols : int, maxRows : int, maxCols : int, isDynamic : bool)
+            + step(wrap : bool, dynamic : bool)
+            + move(fromRow : int, fromCol : int, numRow : int, numCols : int, toRow : int, toCols : int)
+            + resize(addNorth : int, addSouth : int, addEast : int, addWest : int)
+            + insert(cells : vector~vector~bool~~&, row : int, col : int, hollow = false : bool)
+            +getMaxRows() int
+            +getMaxCols() int
+            +getLivingCells() unorder_set~int, int~, HashFunction
+            +getChangedCells() unorder_set~int, int~, HashFunction
+            +setFormatConfig(formatConfig: FormatConfig) 
+            +getFormatConfig() FormatConfig
+        }
+
+        class HashFunction {
+            + operator()(cell : pair~int,int~) size_t
+        }
+    }
+
+    namespace GameOfLife.GUI {
+        class Main.GUI {
+            - run: bool
+            - delay = 100: int
+            - showHelp: bool
+            - verbose: bool
+            - warp: bool
+            - dynamic: bool
+            - template ~TGrid~ getDimensions(window : RenderWindow&, grid : TGrid&, cellSize : int&, offsetX : float, offsetY : float)
+            - drawGrid(window : RenderWindow, grid : Grid&)
+            - drawGrid(window : RenderWindow, grid : ExtendedGrid&)
+            - insertPattern(grid : Grid&, pattern : string&, row : int, col :int)
+            - insertPattern(grid : ExtendedGrid&, pattern : string&, row : int, col :int)
+            - drawHelp(window : RenderWindow, font : Font)
+            - template ~TGrid~ drawVerbose(window : RenderWindow, font : Font, grid : TGrid&, drawTime : longlong, stepTime : longlong, generation : int, delay : int)
+            - template ~TGrid~ mousePosToGridPos(window : RenderWindow&, grid : TGrid, mouseX : int, mouseY : int)
+            - template ~TGrid~ render(window : RenderWindow&, font: Font&) pair~int, int~
+            + Main(args : Argument)
+            + start()       
+        }
+    }
+
+    %% Status
+    <<enumeration>> OutputFormat
+    <<interface>> BaseCell
+    <<interface>> BaseParser
+    <<interface>> IWritable
+    <<abstract>> BaseGrid
+    <<final>> ExtendedParser
+    <<final>> Parser
+
+
+    %% implements :
+    BaseGrid <.. ExtendedGrid : implements
+    BaseGrid <.. Grid : implements
+    BaseParser <.. ExtendedParser : implements 
+    BaseParser <.. Parser : implements
+    IWritable <.. Writer : implements
+    IWritable <.. BaseGrid : implements
+    BaseCell <.. Cell : implements
+
+    %% Composition
+    BaseCell *-- ExtendedGrid 
+    Cell *-- ExtendedGrid
+    Main *-- Main.GUI
+
+    %% Aggrégation
+    FormatConfig --o ExtendedParser
+    FormatConfig --o ExtendedGrid
+    FormatConfig --o Grid
+    FormatConfig --o Parser
+
+    %% use :
+    Arguments <.. Main : uses
+    FormatConfig ..> OutputFormat : uses
+    BaseGrid ..> HashFunction : uses
+    Writer ..> Utils : uses
+    BaseParser ..> Utils : uses
+    ExtendedGrid ..> Cell : uses
+    Main.GUI ..> Utils : uses
+    Main ..> OutputFormat : uses
+    Main.GUI ..> ExtendedGrid : uses 
+    Main.GUI ..> Grid : uses
