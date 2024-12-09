@@ -158,6 +158,11 @@ namespace GameOfLife::CLI {
             warp, dynamic, verbose, GUI, false, aliveChar, deadChar, separator};
     }
 
+    /**
+     * Parse the command line arguments interactively and return the parsed arguments.
+     *
+     * @return The parsed arguments
+     */
     Arguments Arguments::interactiveParse() {
         std::cout << "Interactive mode (Ctrl+C to exit)\n" << std::endl;
 

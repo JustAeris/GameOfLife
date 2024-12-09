@@ -6,12 +6,31 @@
 
 
 namespace GameOfLife::Game {
+    /**
+     * Constructor
+     *
+     * @param rows Rows
+     * @param cols Columns
+     * @param maxRows Maximum rows
+     * @param maxCols Maximum columns
+     * @param isDynamic Dynamic
+     */
     ExtendedGrid::ExtendedGrid(const int rows, const int cols, const int maxRows, const int maxCols, const bool isDynamic) :
     rows(rows), cols(cols), maxRows(maxRows), maxCols(maxCols), isDynamic(isDynamic) {
         cells.resize(rows, std::vector<Cell>(cols));
         next = cells;
     }
 
+    /**
+     * Constructor from existing cells
+     *
+     * @param cells Cells
+     * @param rows Rows
+     * @param cols Columns
+     * @param maxRows Maximum rows
+     * @param maxCols Maximum columns
+     * @param isDynamic Dynamic
+     */
     ExtendedGrid::ExtendedGrid(const std::vector<std::vector<Cell>> &cells, const int rows, const int cols, const int maxRows, const int maxCols, const bool isDynamic) :
     rows(rows), cols(cols), maxRows(maxRows), maxCols(maxCols), isDynamic(isDynamic) {
         this->cells = cells;
@@ -28,6 +47,13 @@ namespace GameOfLife::Game {
         changedCells = livingCells;
     }
 
+    /**
+     * Set a cell to be alive or dead
+     *
+     * @param row Cell's row
+     * @param col Cell's column
+     * @param alive Alive
+     */
     void ExtendedGrid::setAlive(int row, int col, const bool alive) {
         cells[row][col] = alive;
         if (alive)
@@ -36,6 +62,13 @@ namespace GameOfLife::Game {
             livingCells.erase(std::make_pair(row, col));
     }
 
+    /**
+     * Set a cell to be alive or dead in the next generation
+     *
+     * @param row Cell's row
+     * @param col Cell's column
+     * @param alive Alive
+     */
     void ExtendedGrid::setAliveNext(int row, int col, const bool alive) {
         next[row][col] = alive;
         if (alive)
@@ -46,14 +79,36 @@ namespace GameOfLife::Game {
         changedCells.emplace(row, col);
     }
 
+    /**
+     * Check if a cell is alive
+     *
+     * @param row Cell's row
+     * @param col Cell's column
+     * @return Alive
+     */
     bool ExtendedGrid::isAlive(const int row, const int col) const {
         return cells[row][col].isAlive();
     }
 
+    /**
+     * Check if a cell is an obstacle
+     *
+     * @param row Cell's row
+     * @param col Cell's column
+     * @return Obstacle
+     */
     bool ExtendedGrid::isObstacle(int row, int col) const {
         return cells[row][col].isObstacle();
     }
 
+    /**
+     * Get the number of living neighbors
+     *
+     * @param row Row
+     * @param col Column
+     * @param wrap Wrap around the grid (toroidal)
+     * @return Number of living cells
+     */
     int ExtendedGrid::countNeighbors(const int row, const int col, const bool wrap) const {
         int count = 0;
 
@@ -75,6 +130,12 @@ namespace GameOfLife::Game {
         return count;
     }
 
+    /**
+     * Step the grid to the next generation
+     *
+     * @param wrap Wrap around the grid (toroidal)
+     * @param dynamic Dynamic resizing
+     */
     void ExtendedGrid::step(const bool wrap, const bool dynamic) {
         // Clear the changed cells
         changedCells.clear();
@@ -147,14 +208,27 @@ namespace GameOfLife::Game {
         }
     }
 
+    /**
+     * Step the grid to the next generation
+     *
+     * @param wrap Wrap around the grid (toroidal)
+     */
     void ExtendedGrid::step(const bool wrap) {
         step(wrap, !wrap);
     }
 
+    /**
+     * Step the grid to the next generation
+     */
     void ExtendedGrid::step() {
         step(false, true);
     }
 
+    /**
+     * Step the grid to the next generation using multiple threads
+     *
+     * @param wrap Wrap around the grid (toroidal)
+     */
     void ExtendedGrid::multiThreadedStep(const bool wrap) {
         // Assume that the size check has already been done
 
@@ -242,13 +316,28 @@ namespace GameOfLife::Game {
         }
     }
 
-
+    /**
+     * Move a pattern
+     *
+     * @param fromRow Starting row
+     * @param fromCol Starting column
+     * @param numRows Number of rows
+     * @param numCols Number of columns
+     * @param toRow Destination row
+     * @param toCol Destination column
+     */
     void ExtendedGrid::move(const int fromRow, const int fromCol, const int numRows, const int numCols, const int toRow, const int toCol) {
         BaseGrid::move(cells, livingCells, changedCells, fromRow, fromCol, numRows, numCols, toRow, toCol);
     }
 
-
-
+    /**
+     * Resize the grid
+     *
+     * @param addNorth Number of rows to add to the north
+     * @param addEast Number of columns to add to the east
+     * @param addSouth Number of rows to add to the south
+     * @param addWest Number of columns to add to the west
+     */
     void ExtendedGrid::resize(const int addNorth, const int addEast, const int addSouth, const int addWest) {
         BaseGrid::resize(cells, next, livingCells, addNorth, addEast, addSouth, addWest, rows, cols, maxRows, maxCols);
     }
@@ -265,7 +354,11 @@ namespace GameOfLife::Game {
         BaseGrid::insert(this->cells, livingCells, changedCells, cells, row, col, rows, cols, maxRows, maxCols, hollow);
     }
 
-
+    /**
+     * Randomize the grid
+     *
+     * @param aliveProbability Probability of a cell being alive
+     */
     void ExtendedGrid::randomize(const float aliveProbability) {
         if (aliveProbability < 0 || aliveProbability > 1)
             return;
@@ -279,6 +372,9 @@ namespace GameOfLife::Game {
         }
     }
 
+    /**
+     * Clear the grid
+     */
     void ExtendedGrid::clear() {
         // Clear the living cells
         for (auto &row : cells) {
@@ -288,10 +384,21 @@ namespace GameOfLife::Game {
         next = cells;
     }
 
+    /**
+     * Print the grid
+     */
     void ExtendedGrid::print() const {
         print(0, 0, rows, cols);
     }
 
+    /**
+     * Print a section of the grid
+     *
+     * @param fromRow Starting row
+     * @param fromCol Starting column
+     * @param toRow Ending row
+     * @param toCol Ending column
+     */
     void ExtendedGrid::print(const int fromRow, const int fromCol, const int toRow, const int toCol) const {
         for (int i = fromRow; i < toRow; i++) {
             for (int j = fromCol; j < toCol; j++) {
@@ -301,6 +408,12 @@ namespace GameOfLife::Game {
         }
     }
 
+    /**
+     * IWritable implementation
+     * Get the text representation of the grid
+     *
+     * @return Text representation
+     */
     std::string ExtendedGrid::getText() const {
         std::stringstream ss;
         for (int i = 0; i < rows; i++) {

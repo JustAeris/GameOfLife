@@ -7,6 +7,12 @@
 #include "Utils.h"
 
 namespace GameOfLife::File {
+    /**
+     * Writes the data to a file
+     *
+     * @param data The data to write, must implement IWritable
+     * @param filename The filename to write to
+     */
     void Writer::write(const IWritable &data, const std::string &filename) {
         // Argument validation
         if (filename.empty()) {
@@ -27,6 +33,13 @@ namespace GameOfLife::File {
         file.close();
     }
 
+    /**
+     * Writes a vector of IWritable objects to a file
+     *
+     * @param data The data to write
+     * @param outputFolder The folder to write the files to
+     * @param startIndex The starting index for the files
+     */
     void Writer::writeBulk(const std::vector<IWritable> &data, const std::string &outputFolder, int startIndex) {
         for (int i = 0; i < data.size(); i++) {
             write(data[i], outputFolder + "/output" + std::to_string(startIndex + i) + ".txt");
@@ -103,6 +116,13 @@ namespace GameOfLife::File {
         file.close();
     }
 
+    /**
+     * Writes a vector of bool matrices to files in RLE (Run-Length Encoding) format
+     *
+     * @param matrix The 2D array to write
+     * @param outputFolder The folder to write the files to
+     * @param startIndex The starting index for the files
+     */
     void Writer::writeBulkRLE(const std::vector<std::vector<std::vector<bool>>> &matrix,
         const std::string &outputFolder, const int startIndex) {
         for (int i = 0; i < matrix.size(); i++) {

@@ -42,7 +42,8 @@ namespace GameOfLife::CLI {
     }
 
     /**
-     * Simulation processing
+     * Wrapper for extended grid simulation.
+     *
      * @param args Simulation arguments
      */
     void Main::workWrapper(Arguments &args) {
@@ -66,6 +67,11 @@ namespace GameOfLife::CLI {
         simulate<Game::ExtendedGrid, Game::Cell>(grid, args, false, bulk, outputFormat);
     }
 
+    /**
+     * Wrapper for standard grid simulation.
+     *
+     * @param args Simulation arguments
+     */
     void Main::fastWorkWrapper(Arguments &args) {
         // Default output format
         File::OutputFormat outputFormat;
@@ -99,6 +105,17 @@ namespace GameOfLife::CLI {
         simulate<Game::Grid, bool>(grid, args, true, bulk, outputFormat);
     }
 
+    /**
+     * Main simulation loop.
+     *
+     * @tparam TGrid Grid type
+     * @tparam T Cell type
+     * @param grid Grid
+     * @param args Arguments
+     * @param canBeRLE Can the grid be written in RLE?
+     * @param bulk Bulk array for static grid detection
+     * @param outputFormat Output format
+     */
     template<typename TGrid, typename T>
     void Main::simulate(TGrid &grid, Arguments &args, const bool canBeRLE, std::vector<std::vector<std::vector<T>>> &bulk,
         const File::OutputFormat outputFormat) {

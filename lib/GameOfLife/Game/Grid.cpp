@@ -7,12 +7,30 @@
 #include "HashFunction.h"
 
 namespace GameOfLife::Game {
+    /**
+     * Constructs a grid with the specified number of rows and columns.
+     *
+     * @param rows Number of rows
+     * @param cols Number of columns
+     * @param maxRows Maximum number of rows
+     * @param maxCols Maximum number of columns
+     * @param isDynamic Enable dynamic resizing
+     */
     Grid::Grid(const int rows, const int cols, const int maxRows, const int maxCols, const bool isDynamic) :
     rows(rows), cols(cols), maxRows(maxRows), maxCols(maxCols), isDynamic(isDynamic) {
         cells.resize(rows, std::vector<bool>(cols));
         next = cells;
     }
 
+    /**
+     * Constructs a grid with the specified number of rows and columns.
+     *
+     * @param rows Number of rows
+     * @param cols Number of columns
+     * @param maxRows Maximum number of rows
+     * @param maxCols Maximum number of columns
+     * @param isDynamic Enable dynamic resizing
+     */
     Grid::Grid(const std::vector<std::vector<bool>> &cells, const int rows, const int cols, const int maxRows, const int maxCols, const bool isDynamic) :
     rows(rows), cols(cols), maxRows(maxRows), maxCols(maxCols), isDynamic(isDynamic) {
         this->cells = cells;
@@ -29,6 +47,13 @@ namespace GameOfLife::Game {
         changedCells = livingCells;
     }
 
+    /**
+     * Sets the cell at the specified row and column to be alive or dead.
+     *
+     * @param row Cell row
+     * @param col Cell column
+     * @param alive Alive status
+     */
     void Grid::setAlive(int row, int col, const bool alive) {
         cells[row][col] = alive;
         if (alive)
@@ -37,6 +62,13 @@ namespace GameOfLife::Game {
             livingCells.erase(std::make_pair(row, col));
     }
 
+    /**
+     * Sets the cell at the specified row and column to be alive or dead in the next generation.
+     *
+     * @param row Cell row
+     * @param col Cell column
+     * @param alive Alive status
+     */
     void Grid::setAliveNext(int row, int col, const bool alive) {
         next[row][col] = alive;
         if (alive)
@@ -47,11 +79,25 @@ namespace GameOfLife::Game {
         changedCells.emplace(row, col);
     }
 
-
+    /**
+     * Checks if the cell at the specified row and column is alive.
+     *
+     * @param row Cell row
+     * @param col Cell column
+     * @return True if the cell is alive, false otherwise
+     */
     bool Grid::isAlive(const int row, const int col) const {
         return cells[row][col];
     }
 
+    /**
+     * Counts the number of living neighbors around the cell at the specified row and column.
+     *
+     * @param row Cell row
+     * @param col Cell column
+     * @param wrap Whether the grid should wrap around the edges
+     * @return Number of living neighbors
+     */
     int Grid::countNeighbors(const int row, const int col, const bool wrap) const {
         int count = 0;
 
@@ -162,15 +208,27 @@ namespace GameOfLife::Game {
         }
     }
 
+    /**
+     * Steps the grid to the next generation.
+     */
     void Grid::step() {
         step(false, false);
     }
 
+    /**
+     * Steps the grid to the next generation.
+     *
+     * @param wrap If true, the grid will wrap around the edges. This will disable dynamic resizing.
+     */
     void Grid::step(const bool wrap) {
         step(wrap, false);
     }
 
-
+    /**
+     * Steps the grid to the next generation using multiple threads.
+     *
+     * @param wrap If true, the grid will wrap around the edges. This will disable dynamic resizing.
+     */
     void Grid::multiThreadedStep(const bool wrap) {
         // Assume that the size check has already been done
 
@@ -271,13 +329,28 @@ namespace GameOfLife::Game {
         }
     }
 
-
+    /**
+     * Moves a block of cells from one position to another.
+     *
+     * @param fromRow The starting row
+     * @param fromCol The starting column
+     * @param numRows The number of rows to move
+     * @param numCols The number of columns to move
+     * @param toRow The row to move the block to
+     * @param toCol The column to move the block to
+     */
     void Grid::move(const int fromRow, const int fromCol, const int numRows, const int numCols, const int toRow, const int toCol) {
         BaseGrid::move(cells, livingCells, changedCells, fromRow, fromCol, numRows, numCols, toRow, toCol);
     }
 
-
-
+    /**
+     * Resizes the grid by adding rows and columns to the north, east, south, and west.
+     *
+     * @param addNorth Number of rows to add to the north
+     * @param addEast Number of columns to add to the east
+     * @param addSouth Number of rows to add to the south
+     * @param addWest Number of columns to add to the west
+     */
     void Grid::resize(const int addNorth, const int addEast, const int addSouth, const int addWest) {
         BaseGrid::resize(cells, next, livingCells, addNorth, addEast, addSouth, addWest, rows, cols, maxRows, maxCols);
     }
@@ -294,7 +367,11 @@ namespace GameOfLife::Game {
         BaseGrid::insert(this->cells, livingCells, changedCells, cells, row, col, rows, cols, maxRows, maxCols, hollow);
     }
 
-
+    /**
+     * Randomizes the grid with the specified probability of a cell being alive.
+     *
+     * @param aliveProbability Probability of a cell being alive
+     */
     void Grid::randomize(const float aliveProbability) {
         if (aliveProbability < 0 || aliveProbability > 1)
             return;
@@ -308,6 +385,9 @@ namespace GameOfLife::Game {
         }
     }
 
+    /**
+     * Clears the grid.
+     */
     void Grid::clear() {
         // Clear the living cells
         for (auto &row : cells) {
@@ -317,10 +397,21 @@ namespace GameOfLife::Game {
         next = cells;
     }
 
+    /**
+     * Prints the grid to the console.
+     */
     void Grid::print() const {
         print(0, 0, rows, cols);
     }
 
+    /**
+     * Prints a section of the grid to the console.
+     *
+     * @param fromRow The starting row
+     * @param fromCol The starting column
+     * @param toRow The ending row
+     * @param toCol The ending column
+     */
     void Grid::print(const int fromRow, const int fromCol, const int toRow, const int toCol) const {
         for (int i = fromRow; i < toRow; i++) {
             for (int j = fromCol; j < toCol; j++) {
@@ -330,6 +421,12 @@ namespace GameOfLife::Game {
         }
     }
 
+    /**
+     * IWritable implementation.
+     * Gets the grid as a string.
+     *
+     * @return The grid as a string
+     */
     std::string Grid::getText() const {
         std::stringstream ss;
         for (int i = 0; i < rows; i++) {

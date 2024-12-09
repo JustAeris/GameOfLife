@@ -56,10 +56,20 @@ namespace GameOfLife::Game {
         return livingNeighbors == 3;
     }
 
+    /**
+     * Check if the cell is an obstacle
+     *
+     * @return Obstacle
+     */
     bool Cell::isObstacle() const {
         return obstacle;
     }
 
+    /**
+     * Set cell obstacle
+     *
+     * @param obstacle Obstacle
+     */
     void Cell::setObstacle(bool obstacle) {
         this->obstacle = obstacle;
     }
@@ -83,6 +93,9 @@ namespace GameOfLife::Game {
         return this->alive == cell.alive && this->obstacle == cell.obstacle;
     }
 
+    /**
+     * Overload the bool cast operator
+     */
     Cell::operator bool() const {
         return alive;
     }

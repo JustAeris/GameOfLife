@@ -13,6 +13,12 @@
 
 
 namespace GameOfLife::GUI {
+    /**
+     * Draws the help message.
+     *
+     * @param window The window
+     * @param font The font
+     */
     void Main::drawHelp(sf::RenderWindow &window, sf::Font &font) const {
         sf::Text text;
         text.setFont(font);
@@ -39,6 +45,17 @@ namespace GameOfLife::GUI {
         window.draw(text);
     }
 
+    /**
+     * Draws the verbose information.
+     *
+     * @param window The window
+     * @param font The font
+     * @param grid The grid
+     * @param drawTime The time it took to draw the grid
+     * @param stepTime The time it took to step the grid
+     * @param generation The current generation
+     * @param delay The delay between generations
+     */
     template<typename TGrid>
     void Main::drawVerbose(sf::RenderWindow &window, const sf::Font &font, const TGrid &grid, const long long drawTime,
         const long long stepTime, const int generation, const int delay) {
@@ -119,6 +136,13 @@ namespace GameOfLife::GUI {
         render(window, grid, font);
     }
 
+    /**
+     * Renders the grid and handles input.
+     *
+     * @param window The window
+     * @param grid The grid
+     * @param font The font
+     */
     template<typename TGrid>
     void Main::render(sf::RenderWindow &window, TGrid &grid, sf::Font &font) {
         int generation = 0;
@@ -237,6 +261,15 @@ namespace GameOfLife::GUI {
         }
     }
 
+    /**
+     * Converts the mouse position to a grid position.
+     *
+     * @param window The window
+     * @param grid The grid
+     * @param mouseX The mouse x position
+     * @param mouseY The mouse y position
+     * @return The grid position
+     */
     template<typename TGrid>
     std::pair<int, int> Main::mousePosToGridPos(sf::RenderWindow &window, const TGrid &grid, int mouseX, int mouseY) {
         int cellSize;
@@ -249,7 +282,12 @@ namespace GameOfLife::GUI {
         return {gridY, gridX};
     }
 
-
+    /**
+     * Draws the grid to the window.
+     *
+     * @param window The window
+     * @param grid The grid
+     */
     void Main::drawGrid(sf::RenderWindow &window, Game::Grid &grid) {
         int cellSize;
         float offsetX, offsetY;
@@ -270,6 +308,12 @@ namespace GameOfLife::GUI {
 
     }
 
+    /**
+     * Draws the grid to the window.
+     *
+     * @param window The window
+     * @param grid The grid
+     */
     void Main::drawGrid(sf::RenderWindow &window, const Game::ExtendedGrid &grid) {
         int cellSize;
         float offsetX, offsetY;
@@ -293,6 +337,15 @@ namespace GameOfLife::GUI {
         }
     }
 
+    /**
+     * Gets the cell size and offset for the grid.
+     *
+     * @param window The window
+     * @param grid The grid
+     * @param cellSize The cell size
+     * @param offsetX The x offset
+     * @param offsetY The y offset
+     */
     template<typename TGrid>
     void Main::getDimensions(sf::RenderWindow &window, const TGrid &grid, int &cellSize, float &offsetX, float &offsetY) const {
         // Calculate the cell size based on the window size and grid dimensions
@@ -303,6 +356,14 @@ namespace GameOfLife::GUI {
         offsetY = (window.getSize().y - (grid.getRows() * cellSize)) / 2.0f;
     }
 
+    /**
+     * Inserts a pattern into the grid.
+     *
+     * @param grid The grid
+     * @param pattern The pattern
+     * @param row The row to insert the pattern
+     * @param col The column to insert the pattern
+     */
     void Main::insertPattern(Game::Grid &grid, const std::string &pattern, int row, int col) {
         if (row > grid.getRows() && col > grid.getCols() && row < 0 && col < 0)
             return;
@@ -317,6 +378,14 @@ namespace GameOfLife::GUI {
         grid.insert(cells, row, col, false);
     }
 
+    /**
+     * Inserts a pattern into the grid.
+     *
+     * @param grid The grid
+     * @param pattern The pattern
+     * @param row The row to insert the pattern
+     * @param col The column to insert the pattern
+     */
     void Main::insertPattern(Game::ExtendedGrid &grid, const std::string &pattern, int row, int col) {
         if (row > grid.getRows() && col > grid.getCols() && row < 0 && col < 0)
             return;
