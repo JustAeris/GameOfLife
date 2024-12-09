@@ -214,20 +214,28 @@ namespace GameOfLife::CLI {
         std::cin >> verboseStr;
         bool verbose = verboseStr == "y";
 
+        std::cout << "Enable GUI? (y/n): ";
+        std::string guiStr;
+        std::cin >> guiStr;
+        bool GUI = guiStr == "y";
+
+        // Clear the input buffer
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
         std::cout << "Alive char (for parsing, leave empty if using .cells or .rle): ";
-        char aliveChar;
-        std::cin >> aliveChar;
+        std::string aliveChar;
+        std::getline(std::cin, aliveChar);
 
         std::cout << "Dead char (for parsing, leave empty if using .cells or .rle): ";
-        char deadChar;
-        std::cin >> deadChar;
+        std::string deadChar;
+        std::getline(std::cin, deadChar);
 
         std::cout << "Separator (for parsing, leave empty if using .cells or .rle): ";
-        char separator;
-        std::cin >> separator;
+        std::string separator;
+        std::getline(std::cin, separator);
 
         Arguments interactiveArguments(filePath, outputFolder, maxGenerations, delay, highPerformance,
-            endIfStatic, true, warp, verbose, deadChar, separator);
+            endIfStatic, true, warp, dynamic, verbose, GUI, false, aliveChar[0], deadChar[0], separator[0]);
 
         return interactiveArguments;
     }
